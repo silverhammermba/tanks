@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	sf::RenderWindow window
 	{
 		sf::VideoMode(800, 600, 32),
-		"Light Cycles",
+		"Tank Battle",
 		sf::Style::Titlebar
 	};
 	window.setVerticalSyncEnabled(false);
@@ -51,7 +51,10 @@ int main(int argc, char *argv[])
 		// process input
 		while (window.pollEvent(event))
 		{
+			// quit
 			if (event.type == sf::Event::Closed)
+				window.close();
+			else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)
 				window.close();
 			else if (event.type == sf::Event::Resized)
 			{
@@ -68,9 +71,12 @@ int main(int argc, char *argv[])
 					window.setView(view);
 				}
 			}
-			// quit
-			if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)
-				window.close();
+			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
+				move_origin(tank, 0);
+			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
+				move_origin(tank, 15);
+			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right)
+				move_origin(tank, 30);
 		}
 
 		float ftime = fclock.getElapsedTime().asSeconds();
@@ -78,8 +84,9 @@ int main(int argc, char *argv[])
 
 		float time = clock.getElapsedTime().asSeconds();
 
-		move_origin(tank, std::sin(time) * 15.f + 15.f);
+		//move_origin(tank, std::sin(time) * 60.f + 15.f);
 		origin.setPosition(tank.getPosition());
+		tank.rotate(ftime * 30);
 
 		fps_s.str("");
 		fps_s << "FPS " << int (1.f / ftime);
@@ -99,7 +106,8 @@ int main(int argc, char *argv[])
 
 void move_origin(sf::RectangleShape & tank, float pos)
 {
-	float origin = tank.getOrigin().x;
-	tank.setOrigin(v2f(pos, 15.f));
-	tank.move(pos - origin, 0.f);
+	sf::FloatRect before = tank.getGlobalBounds();
+	tank.setOrigin(v2f(15.f, pos));
+	sf::FloatRect after = tank.getGlobalBounds();
+	tank.move(before.left - after.left, before.top - after.top);
 }
