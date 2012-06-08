@@ -1,5 +1,6 @@
 #include "helpers.hpp"
 
-v2f unit_v2f(float dir)
+float deg2rad(float deg)
 {
+	return deg * M_PI / 180.f;
 }

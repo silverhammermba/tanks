@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "helpers.hpp"
+#include "tank.hpp"
 
 #define _USE_MATH_DEFINES
 
@@ -43,25 +44,9 @@ int main(int argc, char *argv[])
 
 	sf::Event event;
 
-	float width = 30.f;
-	float speed = 2.f;
-
-	sf::RectangleShape tank {v2f {width, width}};
-	tank.setOrigin(width / 2.f, width / 2.f);
-	tank.setPosition(view.getCenter());
-	tank.setFillColor(sf::Color(255, 0, 0));
-
-	sf::RectangleShape origin {v2f {1, 1}};
-	origin.setOrigin(0.5f, 0.5f);
-	origin.setFillColor(sf::Color(0, 0, 255));
-
-	sf::RectangleShape direction {v2f {60, 1}};
-	direction.setOrigin(0.f, 0.5f);
-	direction.setFillColor(sf::Color(0, 255, 0));
+	Tank tank {0, v2f(30.f, 35.f), view.getCenter(), sf::Color(0, 0, 170)};
 
 	set_up(window, view);
-	int joystick = 0;
-	float left, right;
 
 	while (window.isOpen())
 	{
@@ -75,9 +60,9 @@ int main(int argc, char *argv[])
 				window.close();
 			else if (event.type == sf::Event::Resized)
 				set_up(window, view);
+			/*
 			else if (event.type == sf::Event::JoystickButtonPressed && event.joystickButton.button == 7)
 				joystick = event.joystickButton.joystickId;
-			/*
 			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
 				move_origin(tank, 0);
 			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
@@ -92,34 +77,8 @@ int main(int argc, char *argv[])
 
 		float time = clock.getElapsedTime().asSeconds();
 
-		if (sf::Joystick::isConnected(joystick))
-		{
-			left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
-			right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
-			// TODO improve deadzone calculation
-			if (std::abs(left) < 30.f)
-				left = 0;
-			if (std::abs(right) < 30.f)
-				right = 0;
-
-			if (left == right)
-			{
-				move_origin(tank, width / 2.f);
-				// TODO refactor
-				tank.move(v2f(std::cos(tank.getRotation()*M_PI/180.f), std::sin(tank.getRotation()*M_PI/180)) * (speed * width * left * ftime * 3.1415926539f / 180.f));
-			}
-			else
-			{
-				move_origin(tank, (width * left) / (left - right));
-				tank.rotate(ftime * (left - right) * speed);
-			}
-		}
-
-		//move_origin(tank, std::sin(time) * 60.f + 15.f);
-		origin.setPosition(tank.getPosition());
-
-		direction.setPosition(tank.getPosition());
-		direction.setRotation(tank.getRotation());
+		tank.update_treads();
+		tank.move(ftime);
 
 		fps_s.str("");
 		fps_s << "FPS " << int (1.f / ftime);
@@ -127,12 +86,11 @@ int main(int argc, char *argv[])
 
 		window.clear(sf::Color(255, 255, 255));
 
-		window.draw(tank);
-		window.draw(direction);
-		window.draw(origin);
+		tank.draw_on(window);
 		window.draw(fps);
 
 		// TODO refactor, could be useful
+		/*
 		dbg_s.str("");
 		dbg_s << "Left: " << left;
 		dbg.setString(dbg_s.str());
@@ -148,19 +106,12 @@ int main(int argc, char *argv[])
 		dbg.setString(dbg_s.str());
 		dbg.setPosition(5.f, 50.f);
 		window.draw(dbg);
+		*/
 
 		window.display();
 	}
 
 	return EXIT_SUCCESS;
-}
-
-void move_origin(sf::RectangleShape & tank, float pos)
-{
-	sf::FloatRect before = tank.getGlobalBounds();
-	tank.setOrigin(v2f(15.f, pos));
-	sf::FloatRect after = tank.getGlobalBounds();
-	tank.move(before.left - after.left, before.top - after.top);
 }
 
 void set_up(sf::RenderWindow & window, sf::View & view)

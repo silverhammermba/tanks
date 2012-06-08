@@ -8,6 +8,8 @@
 
 typedef sf::Vector2f v2f;
 
+float deg2rad(float deg);
+
 // constrain x to [lb, ub]
 template <class T>
 T clamp(T lb, T x, T ub)
