@@ -9,6 +9,7 @@
 typedef sf::Vector2f v2f;
 
 float deg2rad(float deg);
+float deadzone(float val, float zone, float max);
 
 // constrain x to [lb, ub]
 template <class T>

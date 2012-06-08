@@ -44,7 +44,17 @@ int main(int argc, char *argv[])
 
 	sf::Event event;
 
-	Tank tank {0, v2f(30.f, 35.f), view.getCenter(), sf::Color(0, 0, 170)};
+	int joystick = 0;
+
+	for (int joy = 0; joy < 8; joy++)
+	{
+		if (sf::Joystick::isConnected(joy))
+		{
+			joystick = joy;
+			break;
+		}
+	}
+	Tank tank {joystick, v2f(30.f, 35.f), view.getCenter(), sf::Color(0, 0, 170)};
 
 	set_up(window, view);
 
@@ -77,7 +87,7 @@ int main(int argc, char *argv[])
 
 		float time = clock.getElapsedTime().asSeconds();
 
-		tank.update_treads();
+		tank.read_controller();
 		tank.move(ftime);
 
 		fps_s.str("");
