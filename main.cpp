@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <list>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "helpers.hpp"
@@ -44,17 +45,7 @@ int main(int argc, char *argv[])
 
 	sf::Event event;
 
-	int joystick = 0;
-
-	for (int joy = 0; joy < 8; joy++)
-	{
-		if (sf::Joystick::isConnected(joy))
-		{
-			joystick = joy;
-			break;
-		}
-	}
-	Tank tank {joystick, v2f(30.f, 35.f), view.getCenter(), sf::Color(0, 0, 170)};
+	std::list<Tank *> players;
 
 	set_up(window, view);
 
@@ -70,16 +61,20 @@ int main(int argc, char *argv[])
 				window.close();
 			else if (event.type == sf::Event::Resized)
 				set_up(window, view);
-			/*
 			else if (event.type == sf::Event::JoystickButtonPressed && event.joystickButton.button == 7)
-				joystick = event.joystickButton.joystickId;
-			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
-				move_origin(tank, 0);
-			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
-				move_origin(tank, 15);
-			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right)
-				move_origin(tank, 30);
-			*/
+			{
+				bool taken = false;
+				for (auto player = players.begin(); player != players.end(); player++)
+				{
+					if ((*player)->get_joystick() == event.joystickButton.joystickId)
+					{
+						taken = true;
+						break;
+					}
+				}
+				if (!taken)
+					players.push_back(new Tank(event.joystickButton.joystickId, v2f(30.f, 35.f), v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
+			}
 		}
 
 		float ftime = fclock.getElapsedTime().asSeconds();
@@ -87,8 +82,11 @@ int main(int argc, char *argv[])
 
 		float time = clock.getElapsedTime().asSeconds();
 
-		tank.read_controller();
-		tank.move(ftime);
+		for (auto player = players.begin(); player != players.end(); player++)
+		{
+			(*player)->read_controller();
+			(*player)->move(ftime);
+		}
 
 		fps_s.str("");
 		fps_s << "FPS " << int (1.f / ftime);
@@ -96,7 +94,8 @@ int main(int argc, char *argv[])
 
 		window.clear(sf::Color(255, 255, 255));
 
-		tank.draw_on(window);
+		for (auto player = players.begin(); player != players.end(); player++)
+			(*player)->draw_on(window);
 		window.draw(fps);
 
 		// TODO refactor, could be useful

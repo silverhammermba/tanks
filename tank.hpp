@@ -29,6 +29,9 @@ class Tank
 public:
 	Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr);
 	~Tank();
+
+	inline int get_joystick() const { return joystick; };
+
 	void draw_on(sf::RenderWindow & window) const;
 	void read_controller();
 	void move(float time);
