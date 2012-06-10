@@ -1,10 +1,9 @@
 #ifndef HELPERS_H_
 #define HELPERS_H_
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <SFML/System.hpp>
-
-#define _USE_MATH_DEFINES
 
 typedef sf::Vector2f v2f;
 

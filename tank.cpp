@@ -22,6 +22,7 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 	: chasis(size), turret(v2f(30.f, 7.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
+	// TODO calculate sizes rather than store them?
 	width = size.y;
 	middlex = size.x / 2.f;
 	middley = size.y / 2.f;
@@ -30,7 +31,7 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 	speed = 1.5f;
 	turret_dir = 0.f;
 	turn = 0.f;
-	turret_speed = 0.5f;
+	turret_speed = 1.f;
 
 	chasis.setOrigin(middlex, middley);
 	chasis.setPosition(pos);
@@ -89,4 +90,10 @@ void Tank::move(float time)
 	// possible TODO with just a transform?
 	debug.setRotation(chasis.getRotation());
 	debug.setPosition(chasis.getPosition());
+}
+
+Projectile *Tank::fire()
+{
+	v2f traj(std::cos(deg2rad(turret.getRotation())), std::sin(deg2rad(turret.getRotation())));
+	return new Projectile(this, turret.getPosition() + traj * (turret.getSize().x - 5.f), traj);
 }

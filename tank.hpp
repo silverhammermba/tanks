@@ -4,7 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "helpers.hpp"
+#include "projectile.hpp"
 
+class Projectile;
 
 class Tank
 {
@@ -35,6 +37,7 @@ public:
 	void draw_on(sf::RenderWindow & window) const;
 	void read_controller();
 	void move(float time);
+	Projectile *fire();
 };
 
 #endif

@@ -1,13 +1,11 @@
 #include <iostream>
 #include <sstream>
-#include <cmath>
 #include <list>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "helpers.hpp"
 #include "tank.hpp"
-
-#define _USE_MATH_DEFINES
+#include "projectile.hpp"
 
 using std::cin;
 using std::cerr;
@@ -46,6 +44,7 @@ int main(int argc, char *argv[])
 	sf::Event event;
 
 	std::list<Tank *> players;
+	std::list<Projectile *> shots;
 
 	set_up(window, view);
 
@@ -61,6 +60,25 @@ int main(int argc, char *argv[])
 				window.close();
 			else if (event.type == sf::Event::Resized)
 				set_up(window, view);
+			// remove player
+			else if (event.type == sf::Event::JoystickButtonPressed && event.joystickButton.button == 6)
+			{
+				Tank *tank = NULL;
+				for (auto player = players.begin(); player != players.end(); player++)
+				{
+					if ((*player)->get_joystick() == event.joystickButton.joystickId)
+					{
+						tank = *player;
+						break;
+					}
+				}
+				if (tank != NULL)
+				{
+					delete tank;
+					players.remove(tank);
+				}
+			}
+			// add player
 			else if (event.type == sf::Event::JoystickButtonPressed && event.joystickButton.button == 7)
 			{
 				bool taken = false;
