@@ -22,6 +22,9 @@ class Tank
 	float turret_dir;
 	float turn;
 	float turret_speed;
+	bool firing;
+	float shot_speed;
+	float shot_size;
 	sf::RectangleShape chasis;
 	sf::RectangleShape turret;
 	sf::RectangleShape debug;
@@ -33,7 +36,9 @@ public:
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };
+	inline int is_firing() const { return firing; };
 
+	void bind(sf::Event & event);
 	void draw_on(sf::RenderWindow & window) const;
 	void read_controller();
 	void move(float time);

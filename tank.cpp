@@ -12,7 +12,7 @@ void Tank::set_rotation_center(float pos)
 
 void Tank::set_turret()
 {
-	// TODO refactor?
+	// TODO refactor?, store actual position somewhere?
 	turret.setPosition(chasis.getPosition() + v2f(std::sin(deg2rad(chasis.getRotation())), -std::cos(deg2rad(chasis.getRotation()))) * (chasis.getOrigin().y - middley));
 	turret.setRotation(chasis.getRotation());
 	turret.rotate(turret_dir);
@@ -32,6 +32,9 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 	turret_dir = 0.f;
 	turn = 0.f;
 	turret_speed = 1.f;
+	firing = false;
+	shot_speed = 250.f;
+	shot_size = 3.f;
 
 	chasis.setOrigin(middlex, middley);
 	chasis.setPosition(pos);
@@ -47,6 +50,18 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 
 Tank::~Tank()
 {
+}
+
+void Tank::bind(sf::Event & event)
+{
+	if (event.type == sf::Event::JoystickButtonPressed && event.joystickButton.joystickId == joystick)
+	{
+		switch (event.joystickButton.button)
+		{
+			case 5:
+				firing = true;
+		}
+	}
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const
@@ -94,6 +109,7 @@ void Tank::move(float time)
 
 Projectile *Tank::fire()
 {
+	firing = false;
 	v2f traj(std::cos(deg2rad(turret.getRotation())), std::sin(deg2rad(turret.getRotation())));
-	return new Projectile(this, turret.getPosition() + traj * (turret.getSize().x - 5.f), traj);
+	return new Projectile(this, turret.getPosition() + traj * (turret.getSize().x - 5.f), traj, shot_speed, shot_size);
 }

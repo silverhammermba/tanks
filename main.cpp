@@ -12,7 +12,7 @@ using std::cerr;
 using std::endl;
 
 void move_origin(sf::RectangleShape & tank, float pos);
-void set_up(sf::RenderWindow & window, sf::View & view);
+void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
 
 int main(int argc, char *argv[])
 {
@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
 	window.setFramerateLimit(120);
 
 	sf::View view (window.getView());
+	sf::FloatRect screen (0.f, 0.f, window.getSize().x, window.getSize().x);
+	set_up(window, view, screen);
 
 	sf::Event event;
 
 	std::list<Tank *> players;
 	std::list<Projectile *> shots;
-
-	set_up(window, view);
 
 	while (window.isOpen())
 	{
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 			else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)
 				window.close();
 			else if (event.type == sf::Event::Resized)
-				set_up(window, view);
+				set_up(window, view, screen);
 			// remove player
 			else if (event.type == sf::Event::JoystickButtonPressed && event.joystickButton.button == 6)
 			{
@@ -93,6 +93,11 @@ int main(int argc, char *argv[])
 				if (!taken)
 					players.push_back(new Tank(event.joystickButton.joystickId, v2f(30.f, 35.f), v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
 			}
+			else
+			{
+				for (auto player = players.begin(); player != players.end(); player++)
+					(*player)->bind(event);
+			}
 		}
 
 		float ftime = fclock.getElapsedTime().asSeconds();
@@ -104,7 +109,12 @@ int main(int argc, char *argv[])
 		{
 			(*player)->read_controller();
 			(*player)->move(ftime);
+			if ((*player)->is_firing())
+				shots.push_back((*player)->fire());
 		}
+
+		for (auto shot = shots.begin(); shot != shots.end(); shot++)
+			(*shot)->move(ftime);
 
 		fps_s.str("");
 		fps_s << "FPS " << int (1.f / ftime);
@@ -112,8 +122,20 @@ int main(int argc, char *argv[])
 
 		window.clear(sf::Color(255, 255, 255));
 
+		for (auto shot = shots.begin(); shot != shots.end(); shot++)
+		{
+			if (screen.intersects((*shot)->getGlobalBounds()))
+				(*shot)->draw_on(window);
+			else
+			{
+				delete *shot;
+				shot = shots.erase(shot);
+			}
+		}
+
 		for (auto player = players.begin(); player != players.end(); player++)
 			(*player)->draw_on(window);
+
 		window.draw(fps);
 
 		// TODO refactor, could be useful
@@ -141,7 +163,7 @@ int main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 }
 
-void set_up(sf::RenderWindow & window, sf::View & view)
+void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 {
 	sf::Vector2u size = window.getSize();
 	float prop = float (size.x) / size.y;
@@ -155,4 +177,7 @@ void set_up(sf::RenderWindow & window, sf::View & view)
 		view.setSize(v2f((600.f * size.x) / size.y, 600.f));
 		window.setView(view);
 	}
+	// TODO this doesn't take into account the resized view!
+	screen = sf::FloatRect(0.f, 0.f, window.getSize().x, window.getSize().y);
+	cerr << "New screen: " << screen.top << "," << screen.left << " " << screen.width << "," << screen.height << endl;
 }
