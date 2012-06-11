@@ -178,6 +178,7 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 		window.setView(view);
 	}
 	// TODO this doesn't take into account the resized view!
-	screen = sf::FloatRect(0.f, 0.f, window.getSize().x, window.getSize().y);
-	cerr << "New screen: " << screen.top << "," << screen.left << " " << screen.width << "," << screen.height << endl;
+	v2f topleft = window.convertCoords(sf::Vector2i(0, 0));
+	v2f botright = window.convertCoords(sf::Vector2i(window.getSize().x, window.getSize().y));
+	screen = sf::FloatRect(topleft.x, topleft.y, botright.x - topleft.x, botright.y - topleft.y);
 }
