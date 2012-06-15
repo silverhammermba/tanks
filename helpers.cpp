@@ -15,3 +15,19 @@ float deadzone(float val, float zone, float max)
 		return max * (val - zone) / (max - zone);
 	return val;
 }
+
+int sign(float x)
+{
+	if (x < 0.f) return -1;
+	if (x > 0.f) return 1;
+	return 0;
+}
+
+float minmax(float before, float amount, float target)
+{
+	if (target < before)
+		return std::max(amount, target);
+	else if (target > before)
+		return std::min(amount, target);
+	return amount;
+}
