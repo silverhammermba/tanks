@@ -4,7 +4,7 @@
 Projectile::Projectile(Tank *own, const v2f pos, const v2f traj, float sp, float size)
 	: shot(v2f(size, size)), trajectory(traj)
 {
-	std::cerr << "Creating projectile at " << pos.x << "," << pos.y << "\n";
+	//std::cerr << "Creating projectile at " << pos.x << "," << pos.y << "\n";
 	owner = own;
 	speed = sp;
 
@@ -15,7 +15,7 @@ Projectile::Projectile(Tank *own, const v2f pos, const v2f traj, float sp, float
 
 Projectile::~Projectile()
 {
-	std::cerr << "Deleting projectile\n";
+	//std::cerr << "Deleting projectile\n";
 }
 
 void Projectile::draw_on(sf::RenderWindow & window) const
