@@ -11,6 +11,9 @@ class Projectile;
 class Tank
 {
 	static const float DEADZONE;
+	static const float ACCEL;
+	static const float DECEL;
+	static const float SPEED;
 
 	int joystick;
 	float width;
@@ -18,7 +21,8 @@ class Tank
 	float middley;
 	float left;
 	float right;
-	float speed;
+	float target_left;
+	float target_right;
 	float turret_dir;
 	float turn;
 	float turret_speed;

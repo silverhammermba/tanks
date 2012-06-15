@@ -1,6 +1,9 @@
 #include "tank.hpp"
 
-const float Tank::DEADZONE = 30.f;
+const float Tank::DEADZONE = 15.f;
+const float Tank::ACCEL = 80.f;
+const float Tank::DECEL = 95.f;
+const float Tank::SPEED = 1.5f;
 
 void Tank::set_rotation_center(float pos)
 {
@@ -26,9 +29,10 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 	width = size.y;
 	middlex = size.x / 2.f;
 	middley = size.y / 2.f;
-	left = 0;
-	right = 0;
-	speed = 1.5f;
+	left = 0.f;
+	right = 0.f;
+	target_left = 0.f;
+	target_right = 0.f;
 	turret_dir = 0.f;
 	turn = 0.f;
 	turret_speed = 1.f;
@@ -75,10 +79,10 @@ void Tank::read_controller()
 {
 	if (sf::Joystick::isConnected(joystick))
 	{
-		left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
-		right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
-		left = deadzone(left, Tank::DEADZONE, 100.f);
-		right = deadzone(right, Tank::DEADZONE, 100.f);
+		target_left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
+		target_right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
+		target_left = deadzone(target_left, Tank::DEADZONE, 100.f);
+		target_right = deadzone(target_right, Tank::DEADZONE, 100.f);
 
 		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)
 		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)) * turret_speed;
@@ -87,16 +91,51 @@ void Tank::read_controller()
 
 void Tank::move(float time)
 {
+	float sgn = sign(target_left - left);
+	float acceleration = (sgn * left >= 0 ? Tank::ACCEL : Tank::DECEL);
+	float before = left;
+	left = left + sgn * acceleration * time;
+	left = minmax(before, left, target_left);
+
+	sgn = sign(target_right - right);
+	acceleration = (sgn * right >= 0 ? Tank::ACCEL : Tank::DECEL);
+	before = right;
+	right = right + sgn * acceleration * time;
+	right = minmax(before, right, target_right);
+	/*
+	if (left > 0)
+	{
+		if (target_left < left)
+			left = std::max(left - Tank::DECEL * time, target_left);
+		else if (target_left > left)
+			left = std::min(left + Tank::ACCEL * time, target_left);
+	}
+	else if (left < 0)
+	{
+		if (target_left < left)
+			left = std::max(left - Tank::ACCEL * time, target_left);
+		else if (target_left > left)
+			left = std::min(left + Tank::DECEL * time, target_left);
+	}
+	else
+	{
+		if (target_left < left)
+			left = std::max(left - Tank::ACCEL * time, target_left);
+		else if (target_left > left)
+			left = std::min(left + Tank::ACCEL * time, target_left);
+	}
+	*/
+
 	if (left == right)
 	{
 		set_rotation_center(middley);
 		// TODO refactor?
-		chasis.move(v2f(std::cos(deg2rad(chasis.getRotation())), std::sin(deg2rad(chasis.getRotation()))) * deg2rad(speed * width * left * time));
+		chasis.move(v2f(std::cos(deg2rad(chasis.getRotation())), std::sin(deg2rad(chasis.getRotation()))) * deg2rad(Tank::SPEED * width * left * time));
 	}
 	else
 	{
 		set_rotation_center((width * left) / (left - right));
-		chasis.rotate(time * (left - right) * speed);
+		chasis.rotate(time * (left - right) * Tank::SPEED);
 	}
 
 	turret_dir += turn * time;
