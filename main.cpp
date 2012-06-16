@@ -11,7 +11,6 @@ using std::cin;
 using std::cerr;
 using std::endl;
 
-void move_origin(sf::RectangleShape & tank, float pos);
 void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
 
 int main(int argc, char *argv[])
@@ -177,7 +176,6 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 		view.setSize(v2f((600.f * size.x) / size.y, 600.f));
 		window.setView(view);
 	}
-	// TODO this doesn't take into account the resized view!
 	v2f topleft = window.convertCoords(sf::Vector2i(0, 0));
 	v2f botright = window.convertCoords(sf::Vector2i(window.getSize().x, window.getSize().y));
 	screen = sf::FloatRect(topleft.x, topleft.y, botright.x - topleft.x, botright.y - topleft.y);

@@ -1,8 +1,8 @@
 #include "tank.hpp"
 
 const float Tank::DEADZONE = 15.f;
-const float Tank::ACCEL = 80.f;
-const float Tank::DECEL = 95.f;
+const float Tank::ACCEL = 130.f;
+const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
 void Tank::set_rotation_center(float pos)
