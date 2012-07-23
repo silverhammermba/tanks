@@ -3,6 +3,7 @@
 #include <list>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <Box2D/Box2D.h>
 #include "helpers.hpp"
 #include "tank.hpp"
 #include "projectile.hpp"
@@ -15,11 +16,13 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
 
 int main(int argc, char *argv[])
 {
-	sf::Clock fclock; // frame fclock
+	sf::Clock fclock; // frame clock
+	sf::Clock pclock; // physics clock
 	sf::Clock clock; // accumulative clock
 	float timescale = 1.f;
 
 	sf::Text fps;
+	fps.setScale(1.f, -1.f);
 	fps.setCharacterSize(12);
 	fps.setPosition(5.f, 5.f);
 	fps.setColor(sf::Color(0, 0, 0));
@@ -46,6 +49,32 @@ int main(int argc, char *argv[])
 
 	std::list<Tank *> players;
 	std::list<Projectile *> shots;
+
+	// the size of a Serbian M-84
+	sf::Vector2f bodySize(9.53f, 3.57f);
+	sf::Vector2f bodyPos(0.0f, 0.0f);
+	/***** Box2D *****/
+
+	//b2Vec2 gravity(0.0f, 0.0f);
+
+	b2World world(b2Vec2(0.0f, 0.0f));
+
+	// structures for creating dynamic boxes
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(bodyPos.x, bodyPos.y);
+	b2PolygonShape dynamicBox;
+	dynamicBox.SetAsBox(bodySize.x / 2.f, bodySize.y / 2.f);
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &dynamicBox;
+	fixtureDef.density = 1.0f;
+	fixtureDef.friction = 0.3f;
+
+	// set up simulation
+	float timeStep = 1.0f / 60.0f;
+
+	int velocityIterations = 6;
+	int positionIterations = 2;
 
 	while (window.isOpen())
 	{
@@ -90,7 +119,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, v2f(30.f, 35.f), v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
+					players.push_back(new Tank(event.joystickButton.joystickId, world, bodyDef, fixtureDef, bodySize * ppm, v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
 			}
 			else
 			{
@@ -107,13 +136,29 @@ int main(int argc, char *argv[])
 		for (auto player = players.begin(); player != players.end(); player++)
 		{
 			(*player)->read_controller();
+			/*
 			(*player)->move(ftime);
 			if ((*player)->is_firing())
 				shots.push_back((*player)->fire());
+			*/
 		}
 
+		float ptime = pclock.getElapsedTime().asSeconds();
+		if (ptime >= timeStep)
+		{
+			pclock.restart();
+			world.Step(ptime * timescale, velocityIterations, positionIterations);
+
+			for (auto player = players.begin(); player != players.end(); player++)
+			{
+				(*player)->update();
+			}
+		}
+
+		/*
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
 			(*shot)->move(ftime);
+		*/
 
 		fps_s.str("");
 		fps_s << "FPS " << int (1.f / ftime);
@@ -168,12 +213,12 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 	float prop = float (size.x) / size.y;
 	if (size.x * 3 < size.y * 4)
 	{
-		view.setSize(v2f(800, (800.f * size.y) / size.x));
+		view.setSize(v2f(800, -(800.f * size.y) / size.x));
 		window.setView(view);
 	}
 	else if (size.x * 3 > size.y * 4)
 	{
-		view.setSize(v2f((600.f * size.x) / size.y, 600.f));
+		view.setSize(v2f((600.f * size.x) / size.y, -600.f));
 		window.setView(view);
 	}
 	v2f topleft = window.convertCoords(sf::Vector2i(0, 0));

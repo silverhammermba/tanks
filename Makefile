@@ -1,7 +1,7 @@
 all: tanks
 
 tanks: main.o helpers.o tank.o projectile.o
-	g++ -o launch main.o helpers.o tank.o projectile.o -lsfml-graphics -lsfml-window -lsfml-system
+	g++ -o launch main.o helpers.o tank.o projectile.o -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
 
 main.o: main.cpp
 	g++ -c main.cpp -std=c++11

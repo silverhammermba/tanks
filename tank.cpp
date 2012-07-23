@@ -21,7 +21,7 @@ void Tank::set_turret()
 	turret.rotate(turret_dir);
 }
 
-Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
+Tank::Tank(int joy, b2World & world, b2BodyDef & bodyDef, b2FixtureDef & fixtureDef, const v2f & size, const v2f & pos, const sf::Color & clr)
 	: chasis(size), turret(v2f(30.f, 7.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
@@ -40,7 +40,7 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 	shot_speed = 250.f;
 	shot_size = 3.f;
 
-	chasis.setOrigin(middlex, middley);
+	chasis.setOrigin(size * ppm / 2.0f);
 	chasis.setPosition(pos);
 	chasis.setFillColor(clr);
 
@@ -50,8 +50,13 @@ Tank::Tank(int joy, const v2f & size, const v2f & pos, const sf::Color & clr)
 
 	debug.setOrigin(0.f, 0.5f);
 	debug.setFillColor(sf::Color(0, 255, 0));
+
+	body = world.CreateBody(&bodyDef);
+	body->CreateFixture(&fixtureDef);
+	// don't need UserData
 }
 
+// TODO handle Box2D stuff
 Tank::~Tank()
 {
 }
@@ -66,6 +71,17 @@ void Tank::bind(sf::Event & event)
 				firing = true;
 		}
 	}
+}
+
+void Tank::update()
+{
+	b2Vec2 position = body->GetPosition();
+	float angle = body->GetAngle();
+
+	chasis.setPosition(sf::Vector2f(position.x, position.y) * ppm);
+	chasis.setRotation(angle * 180.f / M_PI);
+
+	set_turret();
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const

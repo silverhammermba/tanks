@@ -5,6 +5,8 @@
 #include <cmath>
 #include <SFML/System.hpp>
 
+const float ppm = 10.5f; // pixels per meter
+
 typedef sf::Vector2f v2f;
 
 float deg2rad(float deg);
