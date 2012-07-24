@@ -34,6 +34,7 @@ Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::
 	right = 0.f;
 	target_left = 0.f;
 	target_right = 0.f;
+	horsepower = 10.f; // kN of tread force
 	turret_dir = 0.f;
 	turn = 0.f;
 	turret_speed = 1.f;
@@ -58,6 +59,8 @@ Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position.Set(0.f, 0.f);
+	bodyDef.linearDamping = 1.5f;
+	bodyDef.angularDamping = 4.f;
 
 	b2PolygonShape dynamicBox;
 	dynamicBox.SetAsBox(size.x / 2.f, size.y / 2.f);
@@ -116,8 +119,8 @@ void Tank::read_controller()
 	{
 		target_left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
 		target_right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
-		target_left = deadzone(target_left, Tank::DEADZONE, 1000.f);
-		target_right = deadzone(target_right, Tank::DEADZONE, 1000.f);
+		target_left = horsepower * 10.f * deadzone(target_left, Tank::DEADZONE, 100.f);
+		target_right = horsepower * 10.f * deadzone(target_right, Tank::DEADZONE, 100.f);
 
 		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)
 		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)) * turret_speed;
@@ -135,15 +138,17 @@ void Tank::move(float time)
 
 	b2Vec2 lforce = body->GetWorldVector(b2Vec2(target_left, 0.f));
 	b2Vec2 rforce = body->GetWorldVector(b2Vec2(target_right, 0.f));
-	b2Vec2 ltread = body->GetWorldPoint(b2Vec2(0.f, middley - 0.5f));
-	b2Vec2 rtread = body->GetWorldPoint(b2Vec2(0.f, -middley + 0.5f));
+	b2Vec2 ltread = body->GetWorldPoint(b2Vec2(0.f, middley));
+	b2Vec2 rtread = body->GetWorldPoint(b2Vec2(0.f, -middley));
 
 	body->ApplyForce(lforce, ltread);
 	body->ApplyForce(rforce, rtread);
 
+	/*
 	std::cerr << "Left tread applying " << lforce.x << "," << lforce.y << " at " << ltread.x << "," << ltread.y << "\n";
 	std::cerr << "Right tread applying " << rforce.x << "," << rforce.y << " at " << rtread.x << "," << rtread.y << "\n";
 	std::cerr << "\x1b[2F";
+	*/
 
 	// possible TODO with just a transform?
 	debug.setRotation(chasis.getRotation());

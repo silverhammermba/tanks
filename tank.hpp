@@ -30,6 +30,7 @@ class Tank
 	bool firing;
 	float shot_speed;
 	float shot_size;
+	float horsepower;
 
 	sf::RectangleShape chasis;
 	sf::RectangleShape turret;
