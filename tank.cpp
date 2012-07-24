@@ -6,80 +6,84 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-void Tank::set_rotation_center(float pos)
-{
-	sf::FloatRect before = chasis.getGlobalBounds();
-	chasis.setOrigin(v2f(middlex, pos));
-	sf::FloatRect after = chasis.getGlobalBounds();
-	chasis.move(before.left - after.left, before.top - after.top);
-}
-
-void Tank::set_turret()
-{
-	// TODO refactor?, store actual position somewhere?
-	turret.setPosition(chasis.getPosition() + v2f(std::sin(deg2rad(chasis.getRotation())), -std::cos(deg2rad(chasis.getRotation()))) * (chasis.getOrigin().y - middley) * ppm);
-	turret.setRotation(chasis.getRotation());
-	turret.rotate(turret_dir);
-}
-
 Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::Color & clr)
-	: chasis(size * ppm), turret(v2f(30.f, 7.f)), debug(v2f(60.f, 1.f))
+	: chasisRect(size * ppm), turretRect(v2f((size.x * 2.f * ppm) / 3.f, (size.y * ppm) / 4.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
-	// TODO calculate sizes rather than store them?
-	width = size.y;
-	middlex = size.x / 2.f;
-	middley = size.y / 2.f;
-	left = 0.f;
-	right = 0.f;
-	target_left = 0.f;
-	target_right = 0.f;
+	middley = size.y / 2.f; // half the width of the tank
+	left = 0.f; // left tread force
+	right = 0.f; // right tread force
 	horsepower = 10.f; // kN of tread force
-	turret_dir = 0.f;
 	turn = 0.f;
 	turret_speed = 1.f;
 	firing = false;
 	shot_speed = 250.f;
 	shot_size = 3.f;
 
-	chasis.setOrigin(size * ppm / 2.0f);
-	chasis.setPosition(pos);
-	chasis.setFillColor(clr);
+	chasisRect.setOrigin(size * ppm / 2.0f);
+	chasisRect.setPosition(pos);
+	chasisRect.setFillColor(clr);
 
-	turret.setOrigin(5.f, 3.5f);
-	turret.setFillColor(sf::Color(clr.r / 2.f, clr.g / 2.f, clr.b / 2.f));
-	set_turret();
+	// TODO some weirdness about the turret origin...
+	turretRect.setOrigin(5.f, 3.5f);
+	turretRect.setFillColor(sf::Color(clr.r / 2.f, clr.g / 2.f, clr.b / 2.f));
 
 	debug.setOrigin(0.f, 0.5f);
 	debug.setFillColor(sf::Color(0, 255, 0));
 
 	/***** Box2D *****/
+	world = wrld;
 
 	// structures for creating dynamic boxes
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(0.f, 0.f);
-	bodyDef.linearDamping = 1.5f;
-	bodyDef.angularDamping = 4.f;
+	b2BodyDef chasisBody;
+	chasisBody.type = b2_dynamicBody;
+	chasisBody.position.Set(0.f, 0.f);
+	chasisBody.linearDamping = 1.5f;
+	chasisBody.angularDamping = 4.f;
 
-	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(size.x / 2.f, size.y / 2.f);
+	b2PolygonShape chasisBox;
+	chasisBox.SetAsBox(size.x / 2.f, size.y / 2.f);
 
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynamicBox;
-	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
+	b2FixtureDef chasisFixture;
+	chasisFixture.shape = &chasisBox;
+	chasisFixture.density = 1.0f;
+	chasisFixture.friction = 0.3f;
 
-	world = wrld;
-	body = world->CreateBody(&bodyDef);
-	body->CreateFixture(&fixtureDef);
-	// don't need UserData
+	chasis = world->CreateBody(&chasisBody);
+	chasis->CreateFixture(&chasisFixture);
+
+	b2BodyDef turretBody;
+	turretBody.type = b2_dynamicBody;
+	turretBody.position.Set(0.f, 0.f);
+	// gets weird when turrent tank and turret if too high
+	turretBody.angularDamping = 1.f;
+	
+	b2PolygonShape turretBox;
+	turretBox.SetAsBox(size.x / 3.f, size.y / 8.f);
+
+	b2FixtureDef turretFixture;
+	turretFixture.shape = &turretBox;
+	turretFixture.density = 1.0f;
+	turretFixture.friction = 0.3f;
+
+	turret = world->CreateBody(&turretBody);
+	turret->CreateFixture(&turretFixture);
+
+	b2RevoluteJointDef turretJoint;
+	turretJoint.Initialize(chasis, turret, chasis->GetWorldCenter());
+	// simulate joint friction
+	turretJoint.maxMotorTorque = 10000.f;
+	turretJoint.motorSpeed = 0.0f;
+	turretJoint.enableMotor = true;
+
+	joint = (b2RevoluteJoint*)(world->CreateJoint(&turretJoint));
 }
 
-// TODO handle Box2D stuff
 Tank::~Tank()
 {
-	world->DestroyBody(body);
+	world->DestroyJoint(joint);
+	world->DestroyBody(turret);
+	world->DestroyBody(chasis);
 }
 
 void Tank::bind(sf::Event & event)
@@ -96,20 +100,23 @@ void Tank::bind(sf::Event & event)
 
 void Tank::update()
 {
-	b2Vec2 position = body->GetPosition();
-	float angle = body->GetAngle();
+	b2Vec2 position = chasis->GetPosition();
+	float angle = chasis->GetAngle();
 
-	chasis.setPosition(sf::Vector2f(position.x, position.y) * ppm);
-	chasis.setRotation(rad2deg(angle));
+	chasisRect.setPosition(sf::Vector2f(position.x, position.y) * ppm);
+	chasisRect.setRotation(rad2deg(angle));
 
-	set_turret();
+	position = turret->GetPosition();
+	angle = turret->GetAngle();
+
+	turretRect.setPosition(sf::Vector2f(position.x, position.y) * ppm);
+	turretRect.setRotation(rad2deg(angle));
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const
 {
-	window.draw(chasis);
-	// TODO redo turret with Box2D
-	//window.draw(turret);
+	window.draw(chasisRect);
+	window.draw(turretRect);
 	window.draw(debug);
 }
 
@@ -117,47 +124,35 @@ void Tank::read_controller()
 {
 	if (sf::Joystick::isConnected(joystick))
 	{
-		target_left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
-		target_right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
-		target_left = horsepower * 10.f * deadzone(target_left, Tank::DEADZONE, 100.f);
-		target_right = horsepower * 10.f * deadzone(target_right, Tank::DEADZONE, 100.f);
+		left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
+		right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
+		left = horsepower * 10.f * deadzone(left, Tank::DEADZONE, 100.f);
+		right = horsepower * 10.f * deadzone(right, Tank::DEADZONE, 100.f);
 
-		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)
-		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)) * turret_speed;
+		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)
+		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)) * turret_speed;
 	}
 }
 
-void Tank::move(float time)
+void Tank::move()
 {
-	// TODO use these
-	/*
-	world->ApplyForce(b2Vec2& force, b2Vec2& worldpoint);
-	b2Vec2 world->GetWorldPoint(b2Vec2&localpoint);
-	b2Vec2 GetWorldVector(b2Vec2& localvector);
-	*/
+	b2Vec2 lforce = chasis->GetWorldVector(b2Vec2(left, 0.f));
+	b2Vec2 rforce = chasis->GetWorldVector(b2Vec2(right, 0.f));
+	b2Vec2 ltread = chasis->GetWorldPoint(b2Vec2(0.f, middley));
+	b2Vec2 rtread = chasis->GetWorldPoint(b2Vec2(0.f, -middley));
 
-	b2Vec2 lforce = body->GetWorldVector(b2Vec2(target_left, 0.f));
-	b2Vec2 rforce = body->GetWorldVector(b2Vec2(target_right, 0.f));
-	b2Vec2 ltread = body->GetWorldPoint(b2Vec2(0.f, middley));
-	b2Vec2 rtread = body->GetWorldPoint(b2Vec2(0.f, -middley));
+	chasis->ApplyForce(lforce, ltread);
+	chasis->ApplyForce(rforce, rtread);
 
-	body->ApplyForce(lforce, ltread);
-	body->ApplyForce(rforce, rtread);
+	joint->SetMotorSpeed(turn);
 
-	/*
-	std::cerr << "Left tread applying " << lforce.x << "," << lforce.y << " at " << ltread.x << "," << ltread.y << "\n";
-	std::cerr << "Right tread applying " << rforce.x << "," << rforce.y << " at " << rtread.x << "," << rtread.y << "\n";
-	std::cerr << "\x1b[2F";
-	*/
-
-	// possible TODO with just a transform?
-	debug.setRotation(chasis.getRotation());
-	debug.setPosition(chasis.getPosition());
+	debug.setRotation(chasisRect.getRotation());
+	debug.setPosition(chasisRect.getPosition());
 }
 
 Projectile *Tank::fire()
 {
 	firing = false;
-	v2f traj(std::cos(deg2rad(turret.getRotation())), std::sin(deg2rad(turret.getRotation())));
-	return new Projectile(this, turret.getPosition() + traj * (turret.getSize().x - 5.f), traj, shot_speed, shot_size);
+	v2f traj(std::cos(deg2rad(turretRect.getRotation())), std::sin(deg2rad(turretRect.getRotation())));
+	return new Projectile(this, turretRect.getPosition() + traj * (turretRect.getSize().x - 5.f), traj, shot_speed, shot_size);
 }

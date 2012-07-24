@@ -17,30 +17,24 @@ class Tank
 	static const float SPEED;
 
 	int joystick;
-	float width;
-	float middlex;
 	float middley;
 	float left;
 	float right;
-	float target_left;
-	float target_right;
-	float turret_dir;
+	float horsepower;
 	float turn;
 	float turret_speed;
 	bool firing;
 	float shot_speed;
 	float shot_size;
-	float horsepower;
 
-	sf::RectangleShape chasis;
-	sf::RectangleShape turret;
+	sf::RectangleShape chasisRect;
+	sf::RectangleShape turretRect;
 	sf::RectangleShape debug;
 
 	b2World* world;
-	b2Body* body;
-
-	void set_rotation_center(float pos);
-	void set_turret();
+	b2Body* chasis;
+	b2Body* turret;
+	b2RevoluteJoint* joint;
 public:
 	Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::Color & clr);
 	~Tank();
@@ -52,7 +46,7 @@ public:
 	void update();
 	void draw_on(sf::RenderWindow & window) const;
 	void read_controller();
-	void move(float time);
+	void move();
 	Projectile *fire();
 };
 

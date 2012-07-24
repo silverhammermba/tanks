@@ -1,6 +1,6 @@
 all: tanks
 
-tanks: main.o tank.o projectile.o
+tanks: main.o tank.o projectile.o helpers.o
 	g++ -o launch main.o helpers.o tank.o projectile.o -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
 
 main.o: main.cpp helpers.o

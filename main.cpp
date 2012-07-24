@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 		for (auto player = players.begin(); player != players.end(); player++)
 		{
 			(*player)->read_controller();
-			(*player)->move(ftime);
+			(*player)->move();
 			/*
 			if ((*player)->is_firing())
 				shots.push_back((*player)->fire());
