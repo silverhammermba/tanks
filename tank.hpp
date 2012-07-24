@@ -35,12 +35,13 @@ class Tank
 	sf::RectangleShape turret;
 	sf::RectangleShape debug;
 
+	b2World* world;
 	b2Body* body;
 
 	void set_rotation_center(float pos);
 	void set_turret();
 public:
-	Tank(int joy, b2World & world, b2BodyDef & bodyDef, b2FixtureDef & fixtureDef, const v2f & size, const v2f & pos, const sf::Color & clr);
+	Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::Color & clr);
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };

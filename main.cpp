@@ -50,25 +50,10 @@ int main(int argc, char *argv[])
 	std::list<Tank *> players;
 	std::list<Projectile *> shots;
 
-	// the size of a Serbian M-84
-	sf::Vector2f bodySize(9.53f, 3.57f);
-	sf::Vector2f bodyPos(0.0f, 0.0f);
+	sf::Vector2f bodySize(10.f, 8.f);
 	/***** Box2D *****/
 
-	//b2Vec2 gravity(0.0f, 0.0f);
-
 	b2World world(b2Vec2(0.0f, 0.0f));
-
-	// structures for creating dynamic boxes
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(bodyPos.x, bodyPos.y);
-	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(bodySize.x / 2.f, bodySize.y / 2.f);
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynamicBox;
-	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;
@@ -119,7 +104,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, world, bodyDef, fixtureDef, bodySize * ppm, v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, bodySize * ppm, v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
 			}
 			else
 			{
@@ -136,8 +121,8 @@ int main(int argc, char *argv[])
 		for (auto player = players.begin(); player != players.end(); player++)
 		{
 			(*player)->read_controller();
-			/*
 			(*player)->move(ftime);
+			/*
 			if ((*player)->is_firing())
 				shots.push_back((*player)->fire());
 			*/
@@ -214,13 +199,13 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 	if (size.x * 3 < size.y * 4)
 	{
 		view.setSize(v2f(800, -(800.f * size.y) / size.x));
-		window.setView(view);
 	}
 	else if (size.x * 3 > size.y * 4)
 	{
 		view.setSize(v2f((600.f * size.x) / size.y, -600.f));
-		window.setView(view);
 	}
+	view.setCenter(0.f, 0.f);
+	window.setView(view);
 	v2f topleft = window.convertCoords(sf::Vector2i(0, 0));
 	v2f botright = window.convertCoords(sf::Vector2i(window.getSize().x, window.getSize().y));
 	screen = sf::FloatRect(topleft.x, topleft.y, botright.x - topleft.x, botright.y - topleft.y);

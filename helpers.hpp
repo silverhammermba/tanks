@@ -5,11 +5,12 @@
 #include <cmath>
 #include <SFML/System.hpp>
 
-const float ppm = 10.5f; // pixels per meter
+const float ppm = 2.5f; // pixels per meter
 
 typedef sf::Vector2f v2f;
 
 float deg2rad(float deg);
+float rad2deg(float rad);
 float deadzone(float val, float zone, float max);
 int sign(float x);
 float minmax(float before, float amount, float target);

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "tank.hpp"
 
 const float Tank::DEADZONE = 15.f;
@@ -16,13 +17,13 @@ void Tank::set_rotation_center(float pos)
 void Tank::set_turret()
 {
 	// TODO refactor?, store actual position somewhere?
-	turret.setPosition(chasis.getPosition() + v2f(std::sin(deg2rad(chasis.getRotation())), -std::cos(deg2rad(chasis.getRotation()))) * (chasis.getOrigin().y - middley));
+	turret.setPosition(chasis.getPosition() + v2f(std::sin(deg2rad(chasis.getRotation())), -std::cos(deg2rad(chasis.getRotation()))) * (chasis.getOrigin().y - middley) * ppm);
 	turret.setRotation(chasis.getRotation());
 	turret.rotate(turret_dir);
 }
 
-Tank::Tank(int joy, b2World & world, b2BodyDef & bodyDef, b2FixtureDef & fixtureDef, const v2f & size, const v2f & pos, const sf::Color & clr)
-	: chasis(size), turret(v2f(30.f, 7.f)), debug(v2f(60.f, 1.f))
+Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::Color & clr)
+	: chasis(size * ppm), turret(v2f(30.f, 7.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
 	// TODO calculate sizes rather than store them?
@@ -51,7 +52,23 @@ Tank::Tank(int joy, b2World & world, b2BodyDef & bodyDef, b2FixtureDef & fixture
 	debug.setOrigin(0.f, 0.5f);
 	debug.setFillColor(sf::Color(0, 255, 0));
 
-	body = world.CreateBody(&bodyDef);
+	/***** Box2D *****/
+
+	// structures for creating dynamic boxes
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(0.f, 0.f);
+
+	b2PolygonShape dynamicBox;
+	dynamicBox.SetAsBox(size.x / 2.f, size.y / 2.f);
+
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &dynamicBox;
+	fixtureDef.density = 1.0f;
+	fixtureDef.friction = 0.3f;
+
+	world = wrld;
+	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&fixtureDef);
 	// don't need UserData
 }
@@ -59,6 +76,7 @@ Tank::Tank(int joy, b2World & world, b2BodyDef & bodyDef, b2FixtureDef & fixture
 // TODO handle Box2D stuff
 Tank::~Tank()
 {
+	world->DestroyBody(body);
 }
 
 void Tank::bind(sf::Event & event)
@@ -79,7 +97,7 @@ void Tank::update()
 	float angle = body->GetAngle();
 
 	chasis.setPosition(sf::Vector2f(position.x, position.y) * ppm);
-	chasis.setRotation(angle * 180.f / M_PI);
+	chasis.setRotation(rad2deg(angle));
 
 	set_turret();
 }
@@ -87,7 +105,8 @@ void Tank::update()
 void Tank::draw_on(sf::RenderWindow & window) const
 {
 	window.draw(chasis);
-	window.draw(turret);
+	// TODO redo turret with Box2D
+	//window.draw(turret);
 	window.draw(debug);
 }
 
@@ -97,8 +116,8 @@ void Tank::read_controller()
 	{
 		target_left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
 		target_right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
-		target_left = deadzone(target_left, Tank::DEADZONE, 100.f);
-		target_right = deadzone(target_right, Tank::DEADZONE, 100.f);
+		target_left = deadzone(target_left, Tank::DEADZONE, 1000.f);
+		target_right = deadzone(target_right, Tank::DEADZONE, 1000.f);
 
 		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)
 		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)) * turret_speed;
@@ -107,55 +126,24 @@ void Tank::read_controller()
 
 void Tank::move(float time)
 {
-	float sgn = sign(target_left - left);
-	float acceleration = (sgn * left >= 0 ? Tank::ACCEL : Tank::DECEL);
-	float before = left;
-	left = left + sgn * acceleration * time;
-	left = minmax(before, left, target_left);
-
-	sgn = sign(target_right - right);
-	acceleration = (sgn * right >= 0 ? Tank::ACCEL : Tank::DECEL);
-	before = right;
-	right = right + sgn * acceleration * time;
-	right = minmax(before, right, target_right);
+	// TODO use these
 	/*
-	if (left > 0)
-	{
-		if (target_left < left)
-			left = std::max(left - Tank::DECEL * time, target_left);
-		else if (target_left > left)
-			left = std::min(left + Tank::ACCEL * time, target_left);
-	}
-	else if (left < 0)
-	{
-		if (target_left < left)
-			left = std::max(left - Tank::ACCEL * time, target_left);
-		else if (target_left > left)
-			left = std::min(left + Tank::DECEL * time, target_left);
-	}
-	else
-	{
-		if (target_left < left)
-			left = std::max(left - Tank::ACCEL * time, target_left);
-		else if (target_left > left)
-			left = std::min(left + Tank::ACCEL * time, target_left);
-	}
+	world->ApplyForce(b2Vec2& force, b2Vec2& worldpoint);
+	b2Vec2 world->GetWorldPoint(b2Vec2&localpoint);
+	b2Vec2 GetWorldVector(b2Vec2& localvector);
 	*/
 
-	if (left == right)
-	{
-		set_rotation_center(middley);
-		// TODO refactor?
-		chasis.move(v2f(std::cos(deg2rad(chasis.getRotation())), std::sin(deg2rad(chasis.getRotation()))) * deg2rad(Tank::SPEED * width * left * time));
-	}
-	else
-	{
-		set_rotation_center((width * left) / (left - right));
-		chasis.rotate(time * (left - right) * Tank::SPEED);
-	}
+	b2Vec2 lforce = body->GetWorldVector(b2Vec2(target_left, 0.f));
+	b2Vec2 rforce = body->GetWorldVector(b2Vec2(target_right, 0.f));
+	b2Vec2 ltread = body->GetWorldPoint(b2Vec2(0.f, middley - 0.5f));
+	b2Vec2 rtread = body->GetWorldPoint(b2Vec2(0.f, -middley + 0.5f));
 
-	turret_dir += turn * time;
-	set_turret();
+	body->ApplyForce(lforce, ltread);
+	body->ApplyForce(rforce, rtread);
+
+	std::cerr << "Left tread applying " << lforce.x << "," << lforce.y << " at " << ltread.x << "," << ltread.y << "\n";
+	std::cerr << "Right tread applying " << rforce.x << "," << rforce.y << " at " << rtread.x << "," << rtread.y << "\n";
+	std::cerr << "\x1b[2F";
 
 	// possible TODO with just a transform?
 	debug.setRotation(chasis.getRotation());
