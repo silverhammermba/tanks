@@ -24,3 +24,12 @@ float deadzone(float val, float zone, float max)
 	return val;
 }
 
+b2v v2f2b2v(const v2f & v)
+{
+	return b2v(v.x / ppm, v.y / ppm);
+}
+
+v2f b2v2v2f(const b2v & v)
+{
+	return v2f(v.x, v.y) * ppm;
+}

@@ -6,25 +6,26 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* wrld, b2Body* ground, const v2f & size, const v2f & pos, const sf::Color & clr)
-	: chassisRect(size * ppm), turretRect(v2f(size.x * ppm, size.y * ppm / 4.f)), debug(v2f(60.f, 1.f))
+Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr)
+	: chassisRect(b2v2v2f(size)), turretRect(v2f(size.x * ppm * 3.f / 4.f, size.y * ppm / 4.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
 	middley = size.y / 2.f; // half the width of the tank
 	left = 0.f; // left tread force
 	right = 0.f; // right tread force
-	horsepower = 10.f; // kN of tread force
+	horsepower = 1.f; // kN of tread force
 	turn = 0.f;
 	turret_speed = 1.f;
 	firing = false;
 	shot_speed = 250.f;
 	shot_size = 3.f;
 
-	chassisRect.setOrigin(size * ppm / 2.0f);
-	chassisRect.setPosition(pos);
+	chassisRect.setOrigin(b2v2v2f(size) / 2.0f);
+	chassisRect.setPosition(b2v2v2f(pos));
 	chassisRect.setFillColor(clr);
 
-	turretRect.setOrigin(size.y * ppm / 8.f, size.y * ppm / 8.f);
+	turretRect.setOrigin(size.x * ppm * 3.f / 8.f, size.y * ppm / 8.f);
+	//turretRect.setOrigin(size.y * ppm / 8.f, size.y * ppm / 8.f);
 	turretRect.setFillColor(sf::Color(clr.r / 2.f, clr.g / 2.f, clr.b / 2.f));
 
 	debug.setOrigin(0.f, 0.5f);
@@ -57,7 +58,7 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const v2f & size, const v2f &
 	turretBody.position.Set(0.f, 0.f);
 	
 	b2PolygonShape turretBox;
-	turretBox.SetAsBox(size.x / 3.f, size.y / 8.f);
+	turretBox.SetAsBox(size.x * 3.f / 8.f, size.y / 8.f);
 
 	b2FixtureDef turretFixture;
 	turretFixture.shape = &turretBox;
@@ -108,17 +109,11 @@ void Tank::bind(sf::Event & event)
 
 void Tank::update()
 {
-	b2Vec2 position = chassis->GetPosition();
-	float angle = chassis->GetAngle();
+	chassisRect.setPosition(b2v2v2f(chassis->GetPosition()));
+	chassisRect.setRotation(rad2deg(chassis->GetAngle()));
 
-	chassisRect.setPosition(v2f(position.x, position.y) * ppm);
-	chassisRect.setRotation(rad2deg(angle));
-
-	position = turret->GetPosition();
-	angle = turret->GetAngle();
-
-	turretRect.setPosition(v2f(position.x, position.y) * ppm);
-	turretRect.setRotation(rad2deg(angle));
+	turretRect.setPosition(b2v2v2f(turret->GetPosition()));
+	turretRect.setRotation(rad2deg(turret->GetAngle()));
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const

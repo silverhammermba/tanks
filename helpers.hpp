@@ -4,14 +4,18 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <SFML/System.hpp>
+#include <Box2D/Box2D.h>
 
 const float ppm = 2.5f; // pixels per meter
 
 typedef sf::Vector2f v2f;
+typedef b2Vec2 b2v;
 
 float deg2rad(float deg);
 float rad2deg(float rad);
 float deadzone(float val, float zone, float max);
+b2v v2f2b2v(const v2f & v);
+v2f b2v2v2f(const b2v & v);
 
 // constrain x to [lb, ub]
 template <class T>

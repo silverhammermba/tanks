@@ -37,7 +37,7 @@ class Tank
 	b2RevoluteJoint* joint;
 	b2FrictionJoint* friction;
 public:
-	Tank(int joy, b2World* wrld, b2Body* ground, const v2f & size, const v2f & pos, const sf::Color & clr);
+	Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr);
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };
