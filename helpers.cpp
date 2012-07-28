@@ -11,6 +11,7 @@ float rad2deg(float rad)
 	return rad * 180.f / M_PI;
 }
 
+// create a deadzone of -zone..zone when x ranges from -max..max
 float deadzone(float val, float zone, float max)
 {
 	if (std::abs(val) <= zone)
@@ -23,18 +24,3 @@ float deadzone(float val, float zone, float max)
 	return val;
 }
 
-int sign(float x)
-{
-	if (x < 0.f) return -1;
-	if (x > 0.f) return 1;
-	return 0;
-}
-
-float minmax(float before, float amount, float target)
-{
-	if (target < before)
-		return std::max(amount, target);
-	else if (target > before)
-		return std::min(amount, target);
-	return amount;
-}

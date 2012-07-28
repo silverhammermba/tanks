@@ -111,13 +111,13 @@ void Tank::update()
 	b2Vec2 position = chassis->GetPosition();
 	float angle = chassis->GetAngle();
 
-	chassisRect.setPosition(sf::Vector2f(position.x, position.y) * ppm);
+	chassisRect.setPosition(v2f(position.x, position.y) * ppm);
 	chassisRect.setRotation(rad2deg(angle));
 
 	position = turret->GetPosition();
 	angle = turret->GetAngle();
 
-	turretRect.setPosition(sf::Vector2f(position.x, position.y) * ppm);
+	turretRect.setPosition(v2f(position.x, position.y) * ppm);
 	turretRect.setRotation(rad2deg(angle));
 }
 

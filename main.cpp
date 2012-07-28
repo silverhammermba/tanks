@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 	std::list<Tank *> players;
 	std::list<Projectile *> shots;
 
-	sf::Vector2f bodySize(10.f, 8.f);
+	v2f bodySize(10.f, 8.f);
 	/***** Box2D *****/
 
 	b2World world(b2Vec2(0.0f, 0.0f));
@@ -70,11 +70,11 @@ int main(int argc, char *argv[])
 
 	ground->CreateFixture(&groundFixture);
 
-	sf::RectangleShape groundRect(sf::Vector2f(100.f * ppm, 100.f * ppm));
+	sf::RectangleShape groundRect(v2f(100.f * ppm, 100.f * ppm));
 	groundRect.setOrigin(50.f * ppm, 50.f * ppm);
 	groundRect.setFillColor(sf::Color(40, 40, 40));
 	b2Vec2 groundPos = ground->GetPosition();
-	groundRect.setPosition(sf::Vector2f(groundPos.x, groundPos.y) * ppm);
+	groundRect.setPosition(v2f(groundPos.x, groundPos.y) * ppm);
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;
