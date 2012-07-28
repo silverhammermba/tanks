@@ -55,6 +55,27 @@ int main(int argc, char *argv[])
 
 	b2World world(b2Vec2(0.0f, 0.0f));
 
+	// create ground box
+	b2BodyDef groundBody;
+	groundBody.position.Set(0.0f, 0.0f);
+	b2Body* ground = world.CreateBody(&groundBody);
+
+	b2PolygonShape groundBox;
+	groundBox.SetAsBox(50.f, 50.f);
+	b2FixtureDef groundFixture;
+	groundFixture.shape = &groundBox;
+	// doesn't collide with anything
+	groundFixture.filter.categoryBits = 0x0000;
+	groundFixture.filter.maskBits     = 0x0000;
+
+	ground->CreateFixture(&groundFixture);
+
+	sf::RectangleShape groundRect(sf::Vector2f(100.f * ppm, 100.f * ppm));
+	groundRect.setOrigin(50.f * ppm, 50.f * ppm);
+	groundRect.setFillColor(sf::Color(40, 40, 40));
+	b2Vec2 groundPos = ground->GetPosition();
+	groundRect.setPosition(sf::Vector2f(groundPos.x, groundPos.y) * ppm);
+
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;
 
@@ -104,7 +125,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, &world, bodySize * ppm, v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, ground, bodySize * ppm, v2f(view.getCenter()), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
 			}
 			else
 			{
@@ -150,6 +171,7 @@ int main(int argc, char *argv[])
 		fps.setString(fps_s.str());
 
 		window.clear(sf::Color(255, 255, 255));
+		window.draw(groundRect);
 
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
 		{

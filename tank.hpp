@@ -27,16 +27,17 @@ class Tank
 	float shot_speed;
 	float shot_size;
 
-	sf::RectangleShape chasisRect;
+	sf::RectangleShape chassisRect;
 	sf::RectangleShape turretRect;
 	sf::RectangleShape debug;
 
 	b2World* world;
-	b2Body* chasis;
+	b2Body* chassis;
 	b2Body* turret;
 	b2RevoluteJoint* joint;
+	b2FrictionJoint* friction;
 public:
-	Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::Color & clr);
+	Tank(int joy, b2World* wrld, b2Body* ground, const v2f & size, const v2f & pos, const sf::Color & clr);
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };

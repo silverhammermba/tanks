@@ -6,8 +6,8 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::Color & clr)
-	: chasisRect(size * ppm), turretRect(v2f((size.x * 2.f * ppm) / 3.f, (size.y * ppm) / 4.f)), debug(v2f(60.f, 1.f))
+Tank::Tank(int joy, b2World* wrld, b2Body* ground, const v2f & size, const v2f & pos, const sf::Color & clr)
+	: chassisRect(size * ppm), turretRect(v2f(size.x * ppm, size.y * ppm / 4.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
 	middley = size.y / 2.f; // half the width of the tank
@@ -20,12 +20,11 @@ Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::
 	shot_speed = 250.f;
 	shot_size = 3.f;
 
-	chasisRect.setOrigin(size * ppm / 2.0f);
-	chasisRect.setPosition(pos);
-	chasisRect.setFillColor(clr);
+	chassisRect.setOrigin(size * ppm / 2.0f);
+	chassisRect.setPosition(pos);
+	chassisRect.setFillColor(clr);
 
-	// TODO some weirdness about the turret origin...
-	turretRect.setOrigin(5.f, 3.5f);
+	turretRect.setOrigin(size.y * ppm / 8.f, size.y * ppm / 8.f);
 	turretRect.setFillColor(sf::Color(clr.r / 2.f, clr.g / 2.f, clr.b / 2.f));
 
 	debug.setOrigin(0.f, 0.5f);
@@ -35,28 +34,27 @@ Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::
 	world = wrld;
 
 	// structures for creating dynamic boxes
-	b2BodyDef chasisBody;
-	chasisBody.type = b2_dynamicBody;
-	chasisBody.position.Set(0.f, 0.f);
-	chasisBody.linearDamping = 1.5f;
-	chasisBody.angularDamping = 4.f;
+	b2BodyDef chassisBody;
+	chassisBody.type = b2_dynamicBody;
+	chassisBody.position.Set(0.f, 0.f);
 
-	b2PolygonShape chasisBox;
-	chasisBox.SetAsBox(size.x / 2.f, size.y / 2.f);
+	b2PolygonShape chassisBox;
+	chassisBox.SetAsBox(size.x / 2.f, size.y / 2.f);
 
-	b2FixtureDef chasisFixture;
-	chasisFixture.shape = &chasisBox;
-	chasisFixture.density = 1.0f;
-	chasisFixture.friction = 0.3f;
+	b2FixtureDef chassisFixture;
+	chassisFixture.shape = &chassisBox;
+	chassisFixture.density = 1.0f;
+	chassisFixture.friction = 0.3f;
+	// collides with other chasses
+	chassisFixture.filter.categoryBits = 0x0001;
+	chassisFixture.filter.maskBits     = 0x0001;
 
-	chasis = world->CreateBody(&chasisBody);
-	chasis->CreateFixture(&chasisFixture);
+	chassis = world->CreateBody(&chassisBody);
+	chassis->CreateFixture(&chassisFixture);
 
 	b2BodyDef turretBody;
 	turretBody.type = b2_dynamicBody;
 	turretBody.position.Set(0.f, 0.f);
-	// gets weird when turrent tank and turret if too high
-	turretBody.angularDamping = 1.f;
 	
 	b2PolygonShape turretBox;
 	turretBox.SetAsBox(size.x / 3.f, size.y / 8.f);
@@ -70,20 +68,30 @@ Tank::Tank(int joy, b2World* wrld, const v2f & size, const v2f & pos, const sf::
 	turret->CreateFixture(&turretFixture);
 
 	b2RevoluteJointDef turretJoint;
-	turretJoint.Initialize(chasis, turret, chasis->GetWorldCenter());
+	turretJoint.Initialize(chassis, turret, chassis->GetWorldCenter());
 	// simulate joint friction
 	turretJoint.maxMotorTorque = 10000.f;
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
 	joint = (b2RevoluteJoint*)(world->CreateJoint(&turretJoint));
+
+	b2FrictionJointDef frictionJoint;
+	frictionJoint.Initialize(chassis, ground, b2Vec2(0.f, 0.f));
+	//frictionJoint.localAnchorA = b2Vec2(0.f, 0.f);
+	//frictionJoint.localAnchorB = b2Vec2(0.f, 0.f);
+	frictionJoint.maxForce = 100.0f;
+	frictionJoint.maxTorque = 10000.0f;
+
+	friction = (b2FrictionJoint*)(world->CreateJoint(&frictionJoint));
 }
 
 Tank::~Tank()
 {
+	world->DestroyJoint(friction);
 	world->DestroyJoint(joint);
 	world->DestroyBody(turret);
-	world->DestroyBody(chasis);
+	world->DestroyBody(chassis);
 }
 
 void Tank::bind(sf::Event & event)
@@ -100,11 +108,11 @@ void Tank::bind(sf::Event & event)
 
 void Tank::update()
 {
-	b2Vec2 position = chasis->GetPosition();
-	float angle = chasis->GetAngle();
+	b2Vec2 position = chassis->GetPosition();
+	float angle = chassis->GetAngle();
 
-	chasisRect.setPosition(sf::Vector2f(position.x, position.y) * ppm);
-	chasisRect.setRotation(rad2deg(angle));
+	chassisRect.setPosition(sf::Vector2f(position.x, position.y) * ppm);
+	chassisRect.setRotation(rad2deg(angle));
 
 	position = turret->GetPosition();
 	angle = turret->GetAngle();
@@ -115,7 +123,7 @@ void Tank::update()
 
 void Tank::draw_on(sf::RenderWindow & window) const
 {
-	window.draw(chasisRect);
+	window.draw(chassisRect);
 	window.draw(turretRect);
 	window.draw(debug);
 }
@@ -136,18 +144,18 @@ void Tank::read_controller()
 
 void Tank::move()
 {
-	b2Vec2 lforce = chasis->GetWorldVector(b2Vec2(left, 0.f));
-	b2Vec2 rforce = chasis->GetWorldVector(b2Vec2(right, 0.f));
-	b2Vec2 ltread = chasis->GetWorldPoint(b2Vec2(0.f, middley));
-	b2Vec2 rtread = chasis->GetWorldPoint(b2Vec2(0.f, -middley));
+	b2Vec2 lforce = chassis->GetWorldVector(b2Vec2(left, 0.f));
+	b2Vec2 rforce = chassis->GetWorldVector(b2Vec2(right, 0.f));
+	b2Vec2 ltread = chassis->GetWorldPoint(b2Vec2(0.f, middley));
+	b2Vec2 rtread = chassis->GetWorldPoint(b2Vec2(0.f, -middley));
 
-	chasis->ApplyForce(lforce, ltread);
-	chasis->ApplyForce(rforce, rtread);
+	chassis->ApplyForce(lforce, ltread);
+	chassis->ApplyForce(rforce, rtread);
 
 	joint->SetMotorSpeed(turn);
 
-	debug.setRotation(chasisRect.getRotation());
-	debug.setPosition(chasisRect.getPosition());
+	debug.setRotation(chassisRect.getRotation());
+	debug.setPosition(chassisRect.getPosition());
 }
 
 Projectile *Tank::fire()
