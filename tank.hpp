@@ -34,6 +34,7 @@ class Tank
 	b2World* world;
 	b2Body* chassis;
 	b2Body* turret;
+	b2v turretPos;
 	b2RevoluteJoint* joint;
 	b2FrictionJoint* friction;
 public:

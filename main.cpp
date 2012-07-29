@@ -13,7 +13,7 @@ using std::cerr;
 using std::endl;
 
 void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
-sf::RectangleShape* add_wall(b2Body *ground, float width, float height, float x, float y);
+sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, float y);
 
 int main(int argc, char *argv[])
 {
@@ -68,22 +68,26 @@ int main(int argc, char *argv[])
 	b2FixtureDef groundFixture;
 	groundFixture.shape = &groundBox;
 	// doesn't collide with anything
-	groundFixture.filter.categoryBits = 0x0000;
-	groundFixture.filter.maskBits     = 0x0000;
+	groundFixture.filter.categoryBits = CATEGORY_GROUND;
+	groundFixture.filter.maskBits     = 0;
 
 	ground->CreateFixture(&groundFixture);
 	sf::RectangleShape groundRect(v2f(100.f * ppm, 100.f * ppm));
 	groundRect.setOrigin(50.f * ppm, 50.f * ppm);
-	groundRect.setFillColor(sf::Color(40, 40, 40));
+	groundRect.setFillColor(sf::Color(150, 150, 150));
 	b2Vec2 groundPos = ground->GetPosition();
 	groundRect.setPosition(b2v2v2f(groundPos));
 
 	// walls
-	std::list<sf::RectangleShape *> walls;
-	walls.push_back(add_wall(ground, 10.f, 250.f, -100.f, 0.f));
-	walls.push_back(add_wall(ground, 10.f, 250.f, 100.f, 0.f));
-	walls.push_back(add_wall(ground, 250.f, 10.f, 0.f, -100.f));
-	walls.push_back(add_wall(ground, 250.f, 10.f, 0.f, 100.f));
+	b2BodyDef wallBody;
+	wallBody.position.Set(0.0f, 0.0f);
+	b2Body* walls = world.CreateBody(&wallBody);
+
+	std::list<sf::RectangleShape *> wallRects;
+	wallRects.push_back(add_wall(walls, 10.f, 250.f, -100.f, 0.f));
+	wallRects.push_back(add_wall(walls, 10.f, 250.f, 100.f, 0.f));
+	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, -100.f));
+	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, 100.f));
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;
@@ -183,7 +187,7 @@ int main(int argc, char *argv[])
 		window.clear(sf::Color(255, 255, 255));
 		window.draw(groundRect);
 		
-		for (auto wall = walls.begin(); wall != walls.end(); wall++)
+		for (auto wall = wallRects.begin(); wall != wallRects.end(); wall++)
 			window.draw(**wall);
 
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
@@ -227,7 +231,7 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 	screen = sf::FloatRect(topleft.x, topleft.y, botright.x - topleft.x, botright.y - topleft.y);
 }
 
-sf::RectangleShape* add_wall(b2Body *ground, float width, float height, float x, float y)
+sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, float y)
 {
 	b2PolygonShape box;
 	b2Vec2 size(width, height);
@@ -235,16 +239,16 @@ sf::RectangleShape* add_wall(b2Body *ground, float width, float height, float x,
 	box.SetAsBox(width / 2.f, height / 2.f, pos, 0);
 	b2FixtureDef fixture;
 	fixture.shape = &box;
-	fixture.filter.categoryBits = 0x0001;
-	fixture.filter.maskBits     = 0x0001;
+	fixture.filter.categoryBits = CATEGORY_WALL;
+	fixture.filter.maskBits     = CATEGORY_TANK;
 
-	ground->CreateFixture(&fixture);
-	b2Vec2 groundPos = ground->GetPosition();
+	walls->CreateFixture(&fixture);
+	b2Vec2 wallPos = walls->GetPosition();
 
 	sf::RectangleShape* rect = new sf::RectangleShape(b2v2v2f(size));
 	rect->setOrigin(b2v2v2f(size) / 2.f);
 	rect->setFillColor(sf::Color(100, 100, 100));
-	rect->setPosition(b2v2v2f(groundPos + pos));
+	rect->setPosition(b2v2v2f(wallPos + pos));
 
 	return rect;
 }

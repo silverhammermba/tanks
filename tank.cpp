@@ -15,7 +15,7 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	right = 0.f; // right tread force
 	horsepower = 1.f; // kN of tread force
 	turn = 0.f;
-	turret_speed = 1.f;
+	turret_speed = 0.5f;
 	firing = false;
 	shot_speed = 250.f;
 	shot_size = 3.f;
@@ -24,7 +24,7 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	chassisRect.setPosition(b2v2v2f(pos));
 	chassisRect.setFillColor(clr);
 
-	turretRect.setOrigin(size.x * ppm * 3.f / 8.f, size.y * ppm / 8.f);
+	turretRect.setOrigin(size.y * ppm / 8.f, size.y * ppm / 8.f);
 	//turretRect.setOrigin(size.y * ppm / 8.f, size.y * ppm / 8.f);
 	turretRect.setFillColor(sf::Color(clr.r / 2.f, clr.g / 2.f, clr.b / 2.f));
 
@@ -47,8 +47,8 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	chassisFixture.density = 1.0f;
 	chassisFixture.friction = 0.3f;
 	// collides with other chasses
-	chassisFixture.filter.categoryBits = 0x0001;
-	chassisFixture.filter.maskBits     = 0x0001;
+	chassisFixture.filter.categoryBits = CATEGORY_TANK;
+	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL;
 
 	chassis = world->CreateBody(&chassisBody);
 	chassis->CreateFixture(&chassisFixture);
@@ -58,20 +58,24 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	turretBody.position.Set(0.f, 0.f);
 	
 	b2PolygonShape turretBox;
-	turretBox.SetAsBox(size.x * 3.f / 8.f, size.y / 8.f);
+	// TODO need a DRY way to match up origins
+	turretPos = b2v(size.x * 3.f / 8.f - size.y / 8.f, 0);
+	turretBox.SetAsBox(size.x * 3.f / 8.f, size.y / 8.f, turretPos, 0);
 
 	b2FixtureDef turretFixture;
 	turretFixture.shape = &turretBox;
 	turretFixture.density = 1.0f;
 	turretFixture.friction = 0.3f;
+	turretFixture.filter.categoryBits = CATEGORY_TANK;
+	turretFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL;
 
 	turret = world->CreateBody(&turretBody);
 	turret->CreateFixture(&turretFixture);
 
 	b2RevoluteJointDef turretJoint;
 	turretJoint.Initialize(chassis, turret, chassis->GetWorldCenter());
-	// simulate joint friction
-	turretJoint.maxMotorTorque = 10000.f;
+	// TODO simulate joint friction
+	turretJoint.maxMotorTorque = 1000.f;
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
@@ -81,8 +85,8 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	frictionJoint.Initialize(chassis, ground, b2Vec2(0.f, 0.f));
 	//frictionJoint.localAnchorA = b2Vec2(0.f, 0.f);
 	//frictionJoint.localAnchorB = b2Vec2(0.f, 0.f);
-	frictionJoint.maxForce = 100.0f;
-	frictionJoint.maxTorque = 10000.0f;
+	frictionJoint.maxForce = 1000.0f;
+	frictionJoint.maxTorque = 6000.0f;
 
 	friction = (b2FrictionJoint*)(world->CreateJoint(&frictionJoint));
 }
