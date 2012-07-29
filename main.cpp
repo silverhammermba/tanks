@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	groundBody.position.Set(0.0f, 0.0f);
 	b2Body* ground = world.CreateBody(&groundBody);
 
-	b2v groundSize(240.f, 240.f);
+	b2v groundSize(100.f, 100.f);
 	b2PolygonShape groundBox;
 	groundBox.SetAsBox(groundSize.x / 2.f, groundSize.y / 2.f);
 	b2FixtureDef groundFixture;
