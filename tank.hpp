@@ -6,6 +6,7 @@
 #include <Box2D/Box2D.h>
 #include "helpers.hpp"
 #include "projectile.hpp"
+#include "tread.hpp"
 
 class Projectile;
 
@@ -30,13 +31,13 @@ class Tank
 	sf::RectangleShape chassisRect;
 	sf::RectangleShape turretRect;
 	sf::RectangleShape debug;
+	Tread ltread;
+	Tread rtread;
 
-	b2World* world;
 	b2Body* chassis;
 	b2Body* turret;
 	b2v turretPos;
 	b2RevoluteJoint* joint;
-	b2FrictionJoint* friction;
 public:
 	Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr);
 	~Tank();

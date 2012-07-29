@@ -6,8 +6,9 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr)
-	: chassisRect(b2v2v2f(size)), turretRect(v2f(size.x * ppm * 3.f / 4.f, size.y * ppm / 4.f)), debug(v2f(60.f, 1.f))
+Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr)
+	: chassisRect(b2v2v2f(size)), turretRect(v2f(size.x * ppm * 3.f / 4.f, size.y * ppm / 4.f)),
+	  ltread(world, b2v(size.x, 1.f), b2v(0.f, size.y / 2.f)), rtread(world, b2v(size.x, 1.f), b2v(0.f, -size.y / 2.f)), debug(v2f(60.f, 1.f))
 {
 	joystick = joy;
 	middley = size.y / 2.f; // half the width of the tank
@@ -32,7 +33,6 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	debug.setFillColor(sf::Color(0, 255, 0));
 
 	/***** Box2D *****/
-	world = wrld;
 
 	// structures for creating dynamic boxes
 	b2BodyDef chassisBody;
@@ -53,6 +53,7 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 	chassis = world->CreateBody(&chassisBody);
 	chassis->CreateFixture(&chassisFixture);
 
+	// turret
 	b2BodyDef turretBody;
 	turretBody.type = b2_dynamicBody;
 	turretBody.position.Set(0.f, 0.f);
@@ -81,22 +82,19 @@ Tank::Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v &
 
 	joint = (b2RevoluteJoint*)(world->CreateJoint(&turretJoint));
 
-	b2FrictionJointDef frictionJoint;
-	frictionJoint.Initialize(chassis, ground, b2Vec2(0.f, 0.f));
-	//frictionJoint.localAnchorA = b2Vec2(0.f, 0.f);
-	//frictionJoint.localAnchorB = b2Vec2(0.f, 0.f);
-	frictionJoint.maxForce = 1000.0f;
-	frictionJoint.maxTorque = 6000.0f;
+	b2WeldJointDef lweld;
+	lweld.Initialize(chassis, ltread.get_body(), b2v(0.f, size.y / 2.f));
+	world->CreateJoint(&lweld);
 
-	friction = (b2FrictionJoint*)(world->CreateJoint(&frictionJoint));
+	b2WeldJointDef rweld;
+	rweld.Initialize(chassis, rtread.get_body(), b2v(0.f, -size.y / 2.f));
+	world->CreateJoint(&rweld);
 }
 
 Tank::~Tank()
 {
-	world->DestroyJoint(friction);
-	world->DestroyJoint(joint);
-	world->DestroyBody(turret);
-	world->DestroyBody(chassis);
+	turret->GetWorld()->DestroyBody(turret);
+	chassis->GetWorld()->DestroyBody(chassis);
 }
 
 void Tank::bind(sf::Event & event)
@@ -118,10 +116,15 @@ void Tank::update()
 
 	turretRect.setPosition(b2v2v2f(turret->GetPosition()));
 	turretRect.setRotation(rad2deg(turret->GetAngle()));
+
+	ltread.update();
+	rtread.update();
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const
 {
+	ltread.draw_on(window);
+	rtread.draw_on(window);
 	window.draw(chassisRect);
 	window.draw(turretRect);
 	window.draw(debug);
@@ -133,8 +136,11 @@ void Tank::read_controller()
 	{
 		left = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Y);
 		right = -sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::V);
-		left = horsepower * 10.f * deadzone(left, Tank::DEADZONE, 100.f);
-		right = horsepower * 10.f * deadzone(right, Tank::DEADZONE, 100.f);
+		left = deadzone(left, Tank::DEADZONE, 100.f);
+		right = deadzone(right, Tank::DEADZONE, 100.f);
+
+		left *= horsepower * 10.f;
+		right *= horsepower * 10.f;
 
 		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)
 		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)) * turret_speed;
@@ -145,11 +151,11 @@ void Tank::move()
 {
 	b2Vec2 lforce = chassis->GetWorldVector(b2Vec2(left, 0.f));
 	b2Vec2 rforce = chassis->GetWorldVector(b2Vec2(right, 0.f));
-	b2Vec2 ltread = chassis->GetWorldPoint(b2Vec2(0.f, middley));
-	b2Vec2 rtread = chassis->GetWorldPoint(b2Vec2(0.f, -middley));
+	b2Vec2 ltrd = chassis->GetWorldPoint(b2Vec2(0.f, middley));
+	b2Vec2 rtrd = chassis->GetWorldPoint(b2Vec2(0.f, -middley));
 
-	chassis->ApplyForce(lforce, ltread);
-	chassis->ApplyForce(rforce, rtread);
+	chassis->ApplyForce(lforce, ltrd);
+	chassis->ApplyForce(rforce, rtrd);
 
 	joint->SetMotorSpeed(turn);
 

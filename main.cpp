@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 		"Tank Battle"
 	};
 	window.setVerticalSyncEnabled(false);
-	window.setFramerateLimit(0);
+	window.setFramerateLimit(120);
 
 	sf::View view (window.getView());
 	sf::FloatRect screen (0.f, 0.f, window.getSize().x, window.getSize().x);
@@ -63,8 +63,9 @@ int main(int argc, char *argv[])
 	groundBody.position.Set(0.0f, 0.0f);
 	b2Body* ground = world.CreateBody(&groundBody);
 
+	b2v groundSize(240.f, 240.f);
 	b2PolygonShape groundBox;
-	groundBox.SetAsBox(50.f, 50.f);
+	groundBox.SetAsBox(groundSize.x / 2.f, groundSize.y / 2.f);
 	b2FixtureDef groundFixture;
 	groundFixture.shape = &groundBox;
 	// doesn't collide with anything
@@ -72,8 +73,8 @@ int main(int argc, char *argv[])
 	groundFixture.filter.maskBits     = 0;
 
 	ground->CreateFixture(&groundFixture);
-	sf::RectangleShape groundRect(v2f(100.f * ppm, 100.f * ppm));
-	groundRect.setOrigin(50.f * ppm, 50.f * ppm);
+	sf::RectangleShape groundRect(b2v2v2f(groundSize));
+	groundRect.setOrigin(b2v2v2f(groundSize) / 2.f);
 	groundRect.setFillColor(sf::Color(150, 150, 150));
 	b2Vec2 groundPos = ground->GetPosition();
 	groundRect.setPosition(b2v2v2f(groundPos));
@@ -84,10 +85,10 @@ int main(int argc, char *argv[])
 	b2Body* walls = world.CreateBody(&wallBody);
 
 	std::list<sf::RectangleShape *> wallRects;
-	wallRects.push_back(add_wall(walls, 10.f, 250.f, -100.f, 0.f));
-	wallRects.push_back(add_wall(walls, 10.f, 250.f, 100.f, 0.f));
-	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, -100.f));
-	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, 100.f));
+	wallRects.push_back(add_wall(walls, 10.f, 250.f, -120.f, 0.f));
+	wallRects.push_back(add_wall(walls, 10.f, 250.f, 120.f, 0.f));
+	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, -120.f));
+	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, 120.f));
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;
