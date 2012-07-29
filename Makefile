@@ -22,4 +22,4 @@ turret.o: turret.cpp turret.hpp helpers.o
 	g++ -c turret.cpp -std=c++11
 
 clean:
-	rm -f *~ *.o *.out launch
+	rm -f *.o *.out launch
