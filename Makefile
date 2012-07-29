@@ -3,7 +3,7 @@ all: tanks
 tanks: main.o tank.o projectile.o tread.o turret.o helpers.o
 	g++ -o launch main.o helpers.o tank.o projectile.o tread.o turret.o -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
 
-main.o: main.cpp helpers.o
+main.o: main.cpp tank.o projectile.o helpers.o
 	g++ -c main.cpp -std=c++11
 
 helpers.o: helpers.cpp helpers.hpp
