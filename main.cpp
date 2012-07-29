@@ -55,7 +55,12 @@ int main(int argc, char *argv[])
 	std::list<Projectile *> shots;
 
 	/***** Box2D *****/
-	b2v bodySize(10.f, 8.f);
+
+	// a Soviet T-72
+	b2v bodySize(6.95f, 3.69f);
+	// TODO currently hardcoded in Tank::Tank
+	//b2v turretSize(5.63f, 3.f);
+	//b2v gunSize(5.24f, 0.3f);
 
 	b2World world(b2Vec2(0.0f, 0.0f));
 
@@ -86,10 +91,10 @@ int main(int argc, char *argv[])
 	b2Body* walls = world.CreateBody(&wallBody);
 
 	std::list<sf::RectangleShape *> wallRects;
-	wallRects.push_back(add_wall(walls, 10.f, 250.f, -120.f, 0.f));
-	wallRects.push_back(add_wall(walls, 10.f, 250.f, 120.f, 0.f));
-	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, -120.f));
-	wallRects.push_back(add_wall(walls, 250.f, 10.f, 0.f, 120.f));
+	wallRects.push_back(add_wall(walls, 3.f, 100.f, -48.5f, 0.f));
+	wallRects.push_back(add_wall(walls, 3.f, 100.f, 48.5f, 0.f));
+	wallRects.push_back(add_wall(walls, 100.f, 3.f, 0.f, -48.5f));
+	wallRects.push_back(add_wall(walls, 100.f, 3.f, 0.f, 48.5f));
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;

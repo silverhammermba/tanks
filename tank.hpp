@@ -7,6 +7,7 @@
 #include "helpers.hpp"
 #include "projectile.hpp"
 #include "tread.hpp"
+#include "turret.hpp"
 
 class Projectile;
 
@@ -29,14 +30,12 @@ class Tank
 	float shot_size;
 
 	sf::RectangleShape chassisRect;
-	sf::RectangleShape turretRect;
 	sf::RectangleShape debug;
 	Tread ltread;
 	Tread rtread;
+	Turret turret;
 
 	b2Body* chassis;
-	b2Body* turret;
-	b2v turretPos;
 	b2RevoluteJoint* joint;
 public:
 	Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr);
