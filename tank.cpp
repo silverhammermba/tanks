@@ -67,8 +67,8 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	turretFixture.shape = &turretBox;
 	turretFixture.density = 1.0f;
 	turretFixture.friction = 0.3f;
-	turretFixture.filter.categoryBits = CATEGORY_TANK;
-	turretFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL;
+	turretFixture.filter.categoryBits = CATEGORY_TURRET;
+	turretFixture.filter.maskBits     = CATEGORY_TURRET | CATEGORY_WALL;
 
 	turret = world->CreateBody(&turretBody);
 	turret->CreateFixture(&turretFixture);

@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 		"Tank Battle"
 	};
 	window.setVerticalSyncEnabled(false);
+	// TODO figure out how to divorce graphics and physics
 	window.setFramerateLimit(120);
 
 	sf::View view (window.getView());

@@ -10,6 +10,7 @@ const float ppm = 2.5f; // pixels per meter
 const short CATEGORY_TANK = 0x0001;
 const short CATEGORY_WALL = 0x0002;
 const short CATEGORY_GROUND = 0x0004;
+const short CATEGORY_TURRET = 0x0008;
 
 typedef sf::Vector2f v2f;
 typedef b2Vec2 b2v;
