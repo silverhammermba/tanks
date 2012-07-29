@@ -12,9 +12,8 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 {
 	joystick = joy;
 	middley = size.y / 2.f; // half the width of the tank
-	left = 0.f; // left tread force
-	right = 0.f; // right tread force
-	horsepower = 1.f; // kN of tread force
+	left = 0.f; // left tread percent
+	right = 0.f; // right tread percent
 	turn = 0.f;
 	turret_speed = 10.f;
 	firing = false;
@@ -29,7 +28,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 
 	/***** Box2D *****/
 
-	// structures for creating dynamic boxes
+	// create chassis
 	b2BodyDef chassisBody;
 	chassisBody.type = b2_dynamicBody;
 	chassisBody.position.Set(0.f, 0.f);
@@ -39,25 +38,25 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 
 	b2FixtureDef chassisFixture;
 	chassisFixture.shape = &chassisBox;
-	// 22.34 tons
 	chassisFixture.density = 771.f;
 	chassisFixture.friction = 0.3f;
-	// collides with other chasses
 	chassisFixture.filter.categoryBits = CATEGORY_TANK;
 	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL;
 
 	chassis = world->CreateBody(&chassisBody);
 	chassis->CreateFixture(&chassisFixture);
 
+	// attach turret
 	b2RevoluteJointDef turretJoint;
 	turretJoint.Initialize(chassis, turret.get_body(), chassis->GetWorldCenter());
 	// TODO simulate joint friction
-	turretJoint.maxMotorTorque = 1000.f;
+	turretJoint.maxMotorTorque = 10000.f;
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
 	joint = (b2RevoluteJoint*)(world->CreateJoint(&turretJoint));
 
+	// attach treads
 	b2WeldJointDef lweld;
 	lweld.Initialize(chassis, ltread.get_body(), b2v(0.f, size.y / 2.f));
 	world->CreateJoint(&lweld);
@@ -102,7 +101,6 @@ void Tank::draw_on(sf::RenderWindow & window) const
 	ltread.draw_on(window);
 	rtread.draw_on(window);
 	window.draw(chassisRect);
-	turret.draw_on(window);
 }
 
 void Tank::read_controller()
@@ -114,9 +112,6 @@ void Tank::read_controller()
 		left = deadzone(left, Tank::DEADZONE, 100.f);
 		right = deadzone(right, Tank::DEADZONE, 100.f);
 
-		left *= horsepower * 10.f;
-		right *= horsepower * 10.f;
-
 		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)
 		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)) * turret_speed;
 	}
@@ -124,13 +119,8 @@ void Tank::read_controller()
 
 void Tank::move()
 {
-	b2Vec2 lforce = chassis->GetWorldVector(b2Vec2(left, 0.f));
-	b2Vec2 rforce = chassis->GetWorldVector(b2Vec2(right, 0.f));
-	b2Vec2 ltrd = chassis->GetWorldPoint(b2Vec2(0.f, middley));
-	b2Vec2 rtrd = chassis->GetWorldPoint(b2Vec2(0.f, -middley));
-
-	chassis->ApplyForce(lforce, ltrd);
-	chassis->ApplyForce(rforce, rtrd);
+	ltread.power(left);
+	rtread.power(right);
 
 	joint->SetMotorSpeed(turn);
 

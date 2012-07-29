@@ -8,6 +8,9 @@
 
 class Tread
 {
+	float max_force;
+	float force;
+
 	b2Body* body;
 	sf::RectangleShape rect;
 
@@ -21,6 +24,7 @@ public:
 	inline b2Body* get_body() const { return body; };
 	void update();
 	void draw_on(sf::RenderWindow & window) const;
+	void power(float percent);
 };
 
 #endif

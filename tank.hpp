@@ -43,6 +43,7 @@ public:
 
 	inline int get_joystick() const { return joystick; };
 	inline int is_firing() const { return firing; };
+	inline const Turret & get_turret() const { return turret; };
 
 	void bind(sf::Event & event);
 	void update();

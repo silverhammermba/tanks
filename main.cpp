@@ -211,6 +211,9 @@ int main(int argc, char *argv[])
 		for (auto player = players.begin(); player != players.end(); player++)
 			(*player)->draw_on(window);
 
+		for (auto player = players.begin(); player != players.end(); player++)
+			(*player)->get_turret().draw_on(window);
+
 		window.draw(fps);
 
 		window.display();
@@ -247,7 +250,7 @@ sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, 
 	b2FixtureDef fixture;
 	fixture.shape = &box;
 	fixture.filter.categoryBits = CATEGORY_WALL;
-	fixture.filter.maskBits     = CATEGORY_TANK;
+	fixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_TURRET;
 
 	walls->CreateFixture(&fixture);
 	b2Vec2 wallPos = walls->GetPosition();
