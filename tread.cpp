@@ -4,7 +4,7 @@
 Tread::Tread(b2World* world, b2v size, b2v pos) : rect(b2v2v2f(size))
 {
 	// TODO too sluggish
-	max_force = 18837.f;
+	max_force = 18837.f * 2;
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;

@@ -15,7 +15,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	left = 0.f; // left tread percent
 	right = 0.f; // right tread percent
 	turn = 0.f;
-	turret_speed = 10.f;
+	turret_speed = 1.f;
 	firing = false;
 	shot_speed = 250.f;
 	shot_size = 3.f;
@@ -50,7 +50,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	b2RevoluteJointDef turretJoint;
 	turretJoint.Initialize(chassis, turret.get_body(), chassis->GetWorldCenter());
 	// TODO simulate joint friction
-	turretJoint.maxMotorTorque = 10000.f;
+	turretJoint.maxMotorTorque = 100000.f;
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
@@ -113,7 +113,7 @@ void Tank::read_controller()
 		right = deadzone(right, Tank::DEADZONE, 100.f);
 
 		turn = (sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::Z)
-		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R)) * turret_speed;
+		      - sf::Joystick::getAxisPosition(joystick, sf::Joystick::Axis::R));
 	}
 }
 
@@ -122,14 +122,19 @@ void Tank::move()
 	ltread.power(left);
 	rtread.power(right);
 
-	joint->SetMotorSpeed(turn);
+	joint->SetMotorSpeed(turn * turret_speed);
+	// TODO need to cancel out momentum/prevent buildup of speed
+	if (turn == 0.f)
+		joint->SetMaxMotorTorque(1000000.f);
+	else
+		joint->SetMaxMotorTorque(100000.f);
 
 	debug.setRotation(chassisRect.getRotation());
 	debug.setPosition(chassisRect.getPosition());
 }
 
 /*
-Projectile *Tank::fire()
+Projectile* Tank::fire()
 {
 	firing = false;
 	v2f traj(std::cos(deg2rad(turretRect.getRotation())), std::sin(deg2rad(turretRect.getRotation())));
