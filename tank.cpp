@@ -18,7 +18,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	turret_speed = 1.f;
 	firing = false;
 	shot_speed = 250.f;
-	shot_size = 3.f;
+	shot_size = 0.2f;
 
 	chassisRect.setOrigin(b2v2v2f(size) / 2.0f);
 	chassisRect.setFillColor(clr);
@@ -41,7 +41,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	chassisFixture.density = 771.f;
 	chassisFixture.friction = 0.3f;
 	chassisFixture.filter.categoryBits = CATEGORY_TANK;
-	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL;
+	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;
 
 	chassis = world->CreateBody(&chassisBody);
 	chassis->CreateFixture(&chassisFixture);
@@ -133,11 +133,8 @@ void Tank::move()
 	debug.setPosition(chassisRect.getPosition());
 }
 
-/*
 Projectile* Tank::fire()
 {
 	firing = false;
-	v2f traj(std::cos(deg2rad(turretRect.getRotation())), std::sin(deg2rad(turretRect.getRotation())));
-	return new Projectile(this, turretRect.getPosition() + traj * (turretRect.getSize().x - 5.f), traj, shot_speed, shot_size);
+	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_speed, b2v(shot_size, shot_size));
 }
-*/

@@ -16,7 +16,7 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 	bodyFixture.density = 976.f;
 	bodyFixture.friction = 0.3;
 	bodyFixture.filter.categoryBits = CATEGORY_TURRET;
-	bodyFixture.filter.maskBits = CATEGORY_TURRET | CATEGORY_WALL;
+	bodyFixture.filter.maskBits = CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_WALL;
 
 	b2PolygonShape gunBox;
 	gunBox.SetAsBox(gunSize.x / 2.f, gunSize.y / 2.f, b2v(gunSize.x / 2.f + gunOffset, 0.f), 0);
@@ -59,5 +59,12 @@ void Turret::draw_on(sf::RenderWindow & window) const
 {
 	window.draw(bodyRect);
 	window.draw(gunRect);
+}
+
+b2v Turret::tip() const
+{
+	// TODO hardcoded for now
+	// TODO constant!?
+	body->GetWorldVector(b2v(10.f, 0.f));
 }
 

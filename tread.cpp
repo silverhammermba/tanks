@@ -19,7 +19,7 @@ Tread::Tread(b2World* world, b2v size, b2v pos) : rect(b2v2v2f(size))
 	fixture.density = 1383.f;
 	fixture.friction = 0.3;
 	fixture.filter.categoryBits = CATEGORY_TANK;
-	fixture.filter.maskBits = CATEGORY_TANK | CATEGORY_WALL;
+	fixture.filter.maskBits = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;
 
 	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&fixture);

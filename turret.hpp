@@ -18,6 +18,7 @@ public:
 	inline b2Body* get_body() const { return body; };
 	void update();
 	void draw_on(sf::RenderWindow & window) const;
+	b2v tip() const;
 };
 
 #endif

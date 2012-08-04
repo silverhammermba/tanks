@@ -163,10 +163,8 @@ int main(int argc, char *argv[])
 		{
 			(*player)->read_controller();
 			(*player)->move();
-			/*
 			if ((*player)->is_firing())
 				shots.push_back((*player)->fire());
-			*/
 		}
 
 		float ptime = pclock.getElapsedTime().asSeconds();
@@ -176,9 +174,9 @@ int main(int argc, char *argv[])
 			world.Step(ptime * timescale, velocityIterations, positionIterations);
 
 			for (auto player = players.begin(); player != players.end(); player++)
-			{
 				(*player)->update();
-			}
+			for (auto shot = shots.begin(); shot != shots.end(); shot++)
+				(*shot)->update();
 		}
 
 		/*
@@ -199,12 +197,14 @@ int main(int argc, char *argv[])
 
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
 		{
+			//std::cerr << "Shot at " << (*shot)->getGlobalBounds()
 			if (screen.intersects((*shot)->getGlobalBounds()))
 				(*shot)->draw_on(window);
 			else
 			{
 				delete *shot;
 				shot = shots.erase(shot);
+				std::cerr << "Deleted shot\n";
 			}
 		}
 

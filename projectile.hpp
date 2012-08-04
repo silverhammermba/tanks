@@ -8,17 +8,20 @@ class Tank;
 
 class Projectile
 {
-	Tank *owner;
-	sf::RectangleShape shot;
-	v2f trajectory;
 	float speed;
+	Tank *owner;
+
+	b2Body* body;
+	sf::RectangleShape rect;
+
+	b2v velocity;
 public:
-	Projectile(Tank *own, const v2f pos, const v2f traj, float sp, float size);
+	Projectile(b2World* world, Tank *own, const b2v pos, float dir, float sp, b2v size);
 	~Projectile();
 
-	sf::FloatRect getGlobalBounds() const { return shot.getGlobalBounds(); };
+	void update();
+	sf::FloatRect getGlobalBounds() const { return rect.getGlobalBounds(); };
 	void draw_on(sf::RenderWindow & window) const;
-	void move(float time);
 };
 
 #endif
