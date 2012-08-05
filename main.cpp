@@ -197,14 +197,13 @@ int main(int argc, char *argv[])
 
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
 		{
-			//std::cerr << "Shot at " << (*shot)->getGlobalBounds()
 			if (screen.intersects((*shot)->getGlobalBounds()))
 				(*shot)->draw_on(window);
 			else
 			{
+				sf::FloatRect bounds = (*shot)->getGlobalBounds();
 				delete *shot;
 				shot = shots.erase(shot);
-				std::cerr << "Deleted shot\n";
 			}
 		}
 
@@ -238,7 +237,7 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 	window.setView(view);
 	v2f topleft = window.convertCoords(sf::Vector2i(0, 0));
 	v2f botright = window.convertCoords(sf::Vector2i(window.getSize().x, window.getSize().y));
-	screen = sf::FloatRect(topleft.x, topleft.y, botright.x - topleft.x, botright.y - topleft.y);
+	screen = sf::FloatRect(topleft.x, -topleft.y, botright.x - topleft.x, topleft.y - botright.y);
 }
 
 sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, float y)
@@ -250,7 +249,7 @@ sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, 
 	b2FixtureDef fixture;
 	fixture.shape = &box;
 	fixture.filter.categoryBits = CATEGORY_WALL;
-	fixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_TURRET;
+	fixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_TURRET | CATEGORY_SHOT;
 
 	walls->CreateFixture(&fixture);
 	b2Vec2 wallPos = walls->GetPosition();

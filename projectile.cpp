@@ -10,7 +10,7 @@ Projectile::Projectile(b2World* world, Tank *own, const b2v pos, float dir, floa
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(pos.x, pos.y);
+	bodyDef.position.Set(0.f, 0.f);
 
 	b2PolygonShape polygon;
 	polygon.SetAsBox(size.x / 2.f, size.y / 2.f);
