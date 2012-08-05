@@ -64,7 +64,6 @@ void Turret::draw_on(sf::RenderWindow & window) const
 b2v Turret::tip() const
 {
 	// TODO hardcoded for now
-	// TODO constant!?
-	body->GetWorldVector(b2v(10.f, 0.f));
+	return body->GetWorldPoint(b2v(6.06f, 0.f));
 }
 

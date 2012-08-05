@@ -18,7 +18,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	turret_speed = 1.f;
 	firing = false;
 	shot_speed = 250.f;
-	shot_size = 0.2f;
+	shot_size = 0.3f;
 
 	chassisRect.setOrigin(b2v2v2f(size) / 2.0f);
 	chassisRect.setFillColor(clr);

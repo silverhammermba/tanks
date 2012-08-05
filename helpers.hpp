@@ -7,11 +7,14 @@
 #include <Box2D/Box2D.h>
 
 const float ppm = 7.5f; // pixels per meter
+
 const short CATEGORY_TANK = 1 << 0;
 const short CATEGORY_WALL = 1 << 1;
 const short CATEGORY_GROUND = 1 << 2;
 const short CATEGORY_TURRET = 1 << 3;
 const short CATEGORY_SHOT = 1 << 4;
+const short CATEGORY_PLAYERS = 0xf << 5;
+#define CATEGORY_PLAYER(n) (1 << (5 + n))
 
 typedef sf::Vector2f v2f;
 typedef b2Vec2 b2v;

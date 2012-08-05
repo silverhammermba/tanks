@@ -4,13 +4,13 @@
 Projectile::Projectile(b2World* world, Tank *own, const b2v pos, float dir, float sp, b2v size)
 	: rect(b2v2v2f(size))
 {
-	std::cerr << "Creating projectile at " << pos.x << "," << pos.y << "\n";
 	owner = own;
 	speed = sp;
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(0.f, 0.f);
+	bodyDef.position.Set(pos.x, pos.y);
+	bodyDef.angle = dir;
 
 	b2PolygonShape polygon;
 	polygon.SetAsBox(size.x / 2.f, size.y / 2.f);
