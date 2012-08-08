@@ -5,13 +5,14 @@
 #include <SFML/Window.hpp>
 #include <Box2D/Box2D.h>
 #include "helpers.hpp"
+#include "entity.hpp"
 #include "projectile.hpp"
 #include "tread.hpp"
 #include "turret.hpp"
 
 class Projectile;
 
-class Tank
+class Tank : public Entity
 {
 	static const float DEADZONE;
 	static const float ACCEL;
@@ -41,6 +42,8 @@ public:
 	Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr);
 	~Tank();
 
+	entity_t type() const { return TANK; };
+	void startContact();
 	inline int get_joystick() const { return joystick; };
 	inline int is_firing() const { return firing; };
 	inline const Turret & get_turret() const { return turret; };

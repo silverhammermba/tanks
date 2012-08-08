@@ -46,6 +46,11 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	chassis = world->CreateBody(&chassisBody);
 	chassis->CreateFixture(&chassisFixture);
 
+	chassis->SetUserData(this);
+	turret.SetUserData(this);
+	ltread.SetUserData(this);
+	rtread.SetUserData(this);
+
 	// attach turret
 	b2RevoluteJointDef turretJoint;
 	turretJoint.Initialize(chassis, turret.get_body(), chassis->GetWorldCenter());
@@ -136,5 +141,10 @@ void Tank::move()
 Projectile* Tank::fire()
 {
 	firing = false;
-	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_speed, b2v(shot_size, shot_size));
+	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_speed, b2v(shot_size * 3, shot_size));
+}
+
+void Tank::startContact()
+{
+	1 + 1;
 }

@@ -79,6 +79,11 @@ void Tread::update_friction()
 	body->ApplyAngularImpulse(0.08f * body->GetInertia() * -body->GetAngularVelocity());
 }
 
+void Tread::SetUserData(void* ptr)
+{
+	body->SetUserData(ptr);
+}
+
 void Tread::power(float percent)
 {
 	force = max_force * percent / 100.f;

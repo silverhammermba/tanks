@@ -7,10 +7,26 @@
 #include "helpers.hpp"
 #include "tank.hpp"
 #include "projectile.hpp"
+#include "wall.hpp"
 
 using std::cin;
 using std::cerr;
 using std::endl;
+
+class ShotListener : public b2ContactListener
+{
+public:
+	void BeginContact(b2Contact* contact)
+	{
+		void* ent = contact->GetFixtureA()->GetBody()->GetUserData();
+		if (ent)
+			static_cast<Entity*>(ent)->startContact();
+
+		ent = contact->GetFixtureB()->GetBody()->GetUserData();
+		if (ent)
+			static_cast<Entity*>(ent)->startContact();
+	}
+};
 
 void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
 sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, float y);
@@ -88,13 +104,13 @@ int main(int argc, char *argv[])
 	// walls
 	b2BodyDef wallBody;
 	wallBody.position.Set(0.0f, 0.0f);
-	b2Body* walls = world.CreateBody(&wallBody);
+	Wall::body = world.CreateBody(&wallBody);
 
-	std::list<sf::RectangleShape *> wallRects;
-	wallRects.push_back(add_wall(walls, 3.f, 100.f, -48.5f, 0.f));
-	wallRects.push_back(add_wall(walls, 3.f, 100.f, 48.5f, 0.f));
-	wallRects.push_back(add_wall(walls, 100.f, 3.f, 0.f, -48.5f));
-	wallRects.push_back(add_wall(walls, 100.f, 3.f, 0.f, 48.5f));
+	std::list<Wall *> walls;
+	walls.push_back(new Wall(b2v(3.f, 100.f), b2v(-48.5f, 0.f)));
+	walls.push_back(new Wall(b2v(3.f, 100.f), b2v(48.5f, 0.f)));
+	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, -48.5f)));
+	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, 48.5f)));
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;
@@ -192,8 +208,14 @@ int main(int argc, char *argv[])
 		window.clear(sf::Color(255, 255, 255));
 		window.draw(groundRect);
 		
-		for (auto wall = wallRects.begin(); wall != wallRects.end(); wall++)
-			window.draw(**wall);
+		for (auto wall = walls.begin(); wall != walls.end(); wall++)
+			(*wall)->draw_on(window);
+
+		for (auto player = players.begin(); player != players.end(); player++)
+			(*player)->draw_on(window);
+
+		for (auto player = players.begin(); player != players.end(); player++)
+			(*player)->get_turret().draw_on(window);
 
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
 		{
@@ -201,17 +223,11 @@ int main(int argc, char *argv[])
 				(*shot)->draw_on(window);
 			else
 			{
-				sf::FloatRect bounds = (*shot)->getGlobalBounds();
 				delete *shot;
 				shot = shots.erase(shot);
 			}
 		}
 
-		for (auto player = players.begin(); player != players.end(); player++)
-			(*player)->draw_on(window);
-
-		for (auto player = players.begin(); player != players.end(); player++)
-			(*player)->get_turret().draw_on(window);
 
 		window.draw(fps);
 

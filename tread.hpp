@@ -5,8 +5,9 @@
 #include <SFML/Window.hpp>
 #include <Box2D/Box2D.h>
 #include "helpers.hpp"
+#include "entity.hpp"
 
-class Tread
+class Tread : public Entity
 {
 	float max_force;
 	float force;
@@ -21,6 +22,9 @@ public:
 	Tread(b2World* world, b2v size, b2v pos);
 	~Tread();
 
+	entity_t type() const { return TANK; };
+	void startContact() {};
+	void SetUserData(void* ptr);
 	inline b2Body* get_body() const { return body; };
 	void update();
 	void draw_on(sf::RenderWindow & window) const;

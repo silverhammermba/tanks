@@ -8,6 +8,8 @@
 
 const float ppm = 7.5f; // pixels per meter
 
+enum entity_t {TANK, WALL, SHOT};
+
 const short CATEGORY_TANK = 1 << 0;
 const short CATEGORY_WALL = 1 << 1;
 const short CATEGORY_GROUND = 1 << 2;

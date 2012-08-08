@@ -47,6 +47,11 @@ Turret::~Turret()
 	body->GetWorld()->DestroyBody(body);
 }
 
+void Turret::SetUserData(void* ptr)
+{
+	body->SetUserData(ptr);
+}
+
 void Turret::update()
 {
 	bodyRect.setPosition(b2v2v2f(body->GetPosition()));
