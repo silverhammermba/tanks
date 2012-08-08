@@ -5,6 +5,7 @@ Projectile::Projectile(b2World* world, Tank *own, const b2v pos, float dir, floa
 	: rect(b2v2v2f(size))
 {
 	owner = own;
+	should_explode = false;
 	speed = sp;
 
 	b2BodyDef bodyDef;
@@ -53,4 +54,15 @@ void Projectile::update()
 void Projectile::draw_on(sf::RenderWindow & window) const
 {
 	window.draw(rect);
+}
+
+void Projectile::startContact()
+{
+	should_explode = true;
+}
+
+void Projectile::explode()
+{
+	// TODO something awesome?
+	std::cerr << "BOOOOM!\n";
 }

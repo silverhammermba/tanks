@@ -19,11 +19,14 @@ class Projectile : public Entity
 
 	b2v velocity;
 public:
+	bool should_explode;
+
 	Projectile(b2World* world, Tank *own, const b2v pos, float dir, float sp, b2v size);
 	~Projectile();
 
 	entity_t type() const { return SHOT; };
-	void startContact() {};
+	void startContact();
+	void explode();
 	void update();
 	sf::FloatRect getGlobalBounds() const { return rect.getGlobalBounds(); };
 	void draw_on(sf::RenderWindow & window) const;

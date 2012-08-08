@@ -9,7 +9,7 @@ main.o: main.cpp tank.o projectile.o helpers.o wall.o
 helpers.o: helpers.cpp helpers.hpp
 	g++ -c helpers.cpp -std=c++11
 
-tank.o: tank.cpp tank.hpp tread.o turret.o entity.hpp helpers.o
+tank.o: tank.cpp tank.hpp tread.o turret.o projectile.o entity.hpp helpers.o
 	g++ -c tank.cpp -std=c++11
 
 projectile.o: projectile.cpp projectile.hpp entity.hpp helpers.o

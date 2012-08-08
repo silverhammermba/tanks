@@ -80,6 +80,9 @@ int main(int argc, char *argv[])
 
 	b2World world(b2Vec2(0.0f, 0.0f));
 
+	ShotListener listener;
+	world.SetContactListener(&listener);
+
 	// create ground box
 	b2BodyDef groundBody;
 	groundBody.position.Set(0.0f, 0.0f);
@@ -186,6 +189,14 @@ int main(int argc, char *argv[])
 		float ptime = pclock.getElapsedTime().asSeconds();
 		if (ptime >= timeStep)
 		{
+			for (auto shot = shots.begin(); shot != shots.end(); shot++)
+				if ((*shot)->should_explode)
+				{
+					(*shot)->explode();
+					delete *shot;
+					shot = shots.erase(shot);
+				}
+
 			pclock.restart();
 			world.Step(ptime * timescale, velocityIterations, positionIterations);
 
