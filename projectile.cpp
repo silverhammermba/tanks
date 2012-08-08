@@ -25,6 +25,7 @@ Projectile::Projectile(b2World* world, Tank *own, const b2v pos, float dir, floa
 
 	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&fixture);
+	body->SetUserData(this);
 
 	rect.setOrigin(rect.getSize() / 2.f);
 	rect.setPosition(b2v2v2f(pos));

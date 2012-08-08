@@ -64,6 +64,7 @@ b2v Tread::forward_vel()
 
 void Tread::update_friction()
 {
+	// TODO breaking is currently wonky
 	// stop sideways movement
 	b2v impulse = body->GetMass() * -lateral_vel();
 	body->ApplyLinearImpulse(impulse, body->GetWorldCenter());

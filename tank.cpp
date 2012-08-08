@@ -47,6 +47,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	chassis->CreateFixture(&chassisFixture);
 
 	chassis->SetUserData(this);
+	// TODO can be passed to constructor?
 	turret.SetUserData(this);
 	ltread.SetUserData(this);
 	rtread.SetUserData(this);
@@ -142,9 +143,4 @@ Projectile* Tank::fire()
 {
 	firing = false;
 	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_speed, b2v(shot_size * 3, shot_size));
-}
-
-void Tank::startContact()
-{
-	1 + 1;
 }

@@ -43,7 +43,7 @@ public:
 	~Tank();
 
 	entity_t type() const { return TANK; };
-	void startContact();
+	void startContact() {};
 	inline int get_joystick() const { return joystick; };
 	inline int is_firing() const { return firing; };
 	inline const Turret & get_turret() const { return turret; };

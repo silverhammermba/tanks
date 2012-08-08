@@ -12,6 +12,7 @@ Wall::Wall(b2v size, b2v pos, float angle) : rect(b2v2v2f(size))
 	fixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_TURRET | CATEGORY_SHOT;
 
 	body->CreateFixture(&fixture);
+	body->SetUserData(this);
 
 	rect.setOrigin(rect.getSize() / 2.f);
 	rect.setFillColor(sf::Color(100, 100, 100));
