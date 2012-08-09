@@ -11,7 +11,6 @@ class Tank;
 
 class Projectile : public Entity
 {
-	float speed;
 	Tank *owner;
 
 	b2Body* body;
@@ -26,6 +25,7 @@ public:
 
 	entity_t type() const { return SHOT; };
 	b2v pos() const { return body->GetPosition(); };
+	b2v fwd_norm() const { return body->GetWorldVector(b2v(1.f, 0.f)); };
 	void startContact();
 	void explode();
 	void update();

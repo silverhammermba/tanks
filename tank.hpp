@@ -27,7 +27,7 @@ class Tank : public Entity
 	float turn;
 	float turret_speed;
 	bool firing;
-	float shot_speed;
+	float shot_impulse;
 	float shot_size;
 
 	sf::RectangleShape chassisRect;

@@ -197,12 +197,13 @@ int main(int argc, char *argv[])
 				if ((*shot)->should_explode)
 				{
 					b2v pos = (*shot)->pos();
+					b2v norm = (*shot)->fwd_norm();
 					for (int i = 0; i < rand_i(100); i++)
-						smoke.push_back(new Particle(&world, pos, CATEGORY_TANK));
+						smoke.push_back(new Particle(&world, pos, norm, CATEGORY_TANK));
 					for (int i = 0; i < rand_i(60); i++)
-						smoke.push_back(new Particle(&world, pos, CATEGORY_TURRET));
+						smoke.push_back(new Particle(&world, pos, norm, CATEGORY_TURRET));
 					for (int i = 0; i < rand_i(40); i++)
-						smoke.push_back(new Particle(&world, pos, 0));
+						smoke.push_back(new Particle(&world, pos, norm, 0));
 
 					(*shot)->explode();
 					delete *shot;

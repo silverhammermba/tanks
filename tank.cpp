@@ -17,7 +17,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	turn = 0.f;
 	turret_speed = 1.f;
 	firing = false;
-	shot_speed = 250.f;
+	shot_impulse = 30000.f;
 	shot_size = 0.3f;
 
 	chassisRect.setOrigin(b2v2v2f(size) / 2.0f);
@@ -142,5 +142,10 @@ void Tank::move()
 Projectile* Tank::fire()
 {
 	firing = false;
-	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_speed, b2v(shot_size * 3, shot_size));
+
+	b2Body* tur = turret.get_body();
+	b2v fwd_norm = tur->GetWorldVector(b2v(-1.f, 0.f));
+	tur->ApplyLinearImpulse(b2v(fwd_norm.x * shot_impulse, fwd_norm.y * shot_impulse), tur->GetWorldCenter());
+
+	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_impulse, b2v(shot_size * 3, shot_size));
 }
