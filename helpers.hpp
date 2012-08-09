@@ -3,6 +3,7 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <cstdlib>
 #include <SFML/System.hpp>
 #include <Box2D/Box2D.h>
 
@@ -15,12 +16,15 @@ const short CATEGORY_WALL = 1 << 1;
 const short CATEGORY_GROUND = 1 << 2;
 const short CATEGORY_TURRET = 1 << 3;
 const short CATEGORY_SHOT = 1 << 4;
-const short CATEGORY_PLAYERS = 0xf << 5;
-#define CATEGORY_PLAYER(n) (1 << (5 + n))
+const short CATEGORY_SMOKE = 1 << 5;
+const short CATEGORY_PLAYERS = 0xf << 6;
+#define CATEGORY_PLAYER(n) (1 << (6 + n))
 
 typedef sf::Vector2f v2f;
 typedef b2Vec2 b2v;
 
+float rand_f(float max);
+float rand_i(int max);
 float deg2rad(float deg);
 float rad2deg(float rad);
 float deadzone(float val, float zone, float max);

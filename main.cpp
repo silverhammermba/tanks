@@ -1,12 +1,14 @@
 #include <iostream>
 #include <sstream>
 #include <list>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <Box2D/Box2D.h>
 #include "helpers.hpp"
 #include "tank.hpp"
 #include "projectile.hpp"
+#include "particle.hpp"
 #include "wall.hpp"
 
 using std::cin;
@@ -33,6 +35,7 @@ sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, 
 
 int main(int argc, char *argv[])
 {
+	srand((unsigned int)time(NULL));
 	sf::Clock fclock; // frame clock
 	sf::Clock pclock; // physics clock
 	sf::Clock clock; // accumulative clock
@@ -69,6 +72,7 @@ int main(int argc, char *argv[])
 
 	std::list<Tank *> players;
 	std::list<Projectile *> shots;
+	std::list<Particle *> smoke;
 
 	/***** Box2D *****/
 
@@ -164,7 +168,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, &world, ground, bodySize, b2v(0, 0), sf::Color(rand() % 256, rand() % 256, rand() % 256)));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, ground, bodySize, b2v(0, 0), sf::Color(rand_i(256), rand_i(256), rand_i(256))));
 			}
 			else
 			{
@@ -192,6 +196,14 @@ int main(int argc, char *argv[])
 			for (auto shot = shots.begin(); shot != shots.end(); shot++)
 				if ((*shot)->should_explode)
 				{
+					b2v pos = (*shot)->pos();
+					for (int i = 0; i < rand_i(100); i++)
+						smoke.push_back(new Particle(&world, pos, CATEGORY_TANK));
+					for (int i = 0; i < rand_i(60); i++)
+						smoke.push_back(new Particle(&world, pos, CATEGORY_TURRET));
+					for (int i = 0; i < rand_i(40); i++)
+						smoke.push_back(new Particle(&world, pos, 0));
+
 					(*shot)->explode();
 					delete *shot;
 					shot = shots.erase(shot);
@@ -204,12 +216,9 @@ int main(int argc, char *argv[])
 				(*player)->update();
 			for (auto shot = shots.begin(); shot != shots.end(); shot++)
 				(*shot)->update();
+			for (auto part = smoke.begin(); part != smoke.end(); part++)
+				(*part)->update(ptime * timescale);
 		}
-
-		/*
-		for (auto shot = shots.begin(); shot != shots.end(); shot++)
-			(*shot)->move(ftime);
-		*/
 
 		fps_s.str("");
 		fps_s << "FPS " << int (1.f / ftime);
@@ -239,6 +248,16 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		for (auto part = smoke.begin(); part != smoke.end(); part++)
+		{
+			if ((*part)->expired())
+			{
+				delete *part;
+				part = smoke.erase(part);
+			}
+			else
+				(*part)->draw_on(window);
+		}
 
 		window.draw(fps);
 

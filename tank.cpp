@@ -41,7 +41,7 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	chassisFixture.density = 771.f;
 	chassisFixture.friction = 0.3f;
 	chassisFixture.filter.categoryBits = CATEGORY_TANK;
-	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;
+	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 
 	chassis = world->CreateBody(&chassisBody);
 	chassis->CreateFixture(&chassisFixture);

@@ -25,6 +25,7 @@ public:
 	~Projectile();
 
 	entity_t type() const { return SHOT; };
+	b2v pos() const { return body->GetPosition(); };
 	void startContact();
 	void explode();
 	void update();

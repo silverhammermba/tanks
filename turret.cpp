@@ -16,7 +16,7 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 	bodyFixture.density = 976.f;
 	bodyFixture.friction = 0.3;
 	bodyFixture.filter.categoryBits = CATEGORY_TURRET;
-	bodyFixture.filter.maskBits = CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_WALL;
+	bodyFixture.filter.maskBits = CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 
 	b2PolygonShape gunBox;
 	gunBox.SetAsBox(gunSize.x / 2.f, gunSize.y / 2.f, b2v(gunSize.x / 2.f + gunOffset, 0.f), 0);

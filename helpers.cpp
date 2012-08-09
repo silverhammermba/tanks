@@ -1,5 +1,14 @@
 #include "helpers.hpp"
 
+float rand_f(float max)
+{
+	return (rand() / (float)RAND_MAX) * max;
+}
+
+float rand_i(int max)
+{
+	return rand() % max;
+}
 
 float deg2rad(float deg)
 {
