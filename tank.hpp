@@ -9,10 +9,12 @@
 #include "projectile.hpp"
 #include "tread.hpp"
 #include "turret.hpp"
+#include "chassis.hpp"
 
 class Projectile;
+class Turret;
 
-class Tank : public Entity
+class Tank
 {
 	static const float DEADZONE;
 	static const float ACCEL;
@@ -27,26 +29,21 @@ class Tank : public Entity
 	float turn;
 	float turret_speed;
 	bool firing;
-	float shot_impulse;
-	float shot_size;
 
 	sf::RectangleShape chassisRect;
-	sf::RectangleShape debug;
-	Tread ltread;
-	Tread rtread;
-	Turret turret;
+	Tread* ltread;
+	Tread* rtread;
+	Turret* turret;
+	Chassis* chassis;
 
-	b2Body* chassis;
 	b2RevoluteJoint* joint;
 public:
-	Tank(int joy, b2World* wrld, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr);
+	Tank(int joy, b2World* world, const b2v & size, const b2v & pos, const sf::Color & clr, float turtorque, Chassis* chas, Turret* tur, Tread* ltr, Tread *rtr);
 	~Tank();
 
-	entity_t type() const { return TANK; };
-	void startContact() {};
 	inline int get_joystick() const { return joystick; };
 	inline int is_firing() const { return firing; };
-	inline const Turret & get_turret() const { return turret; };
+	inline Turret* get_turret() const { return turret; };
 
 	void bind(sf::Event & event);
 	void update();

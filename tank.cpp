@@ -6,10 +6,13 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v & pos, const sf::Color & clr)
-	: chassisRect(b2v2v2f(size)), ltread(world, b2v(size.x, 0.68f), b2v(0.f, size.y / 2.f)), rtread(world, b2v(size.x, 0.68f), b2v(0.f, -size.y / 2.f)),
-	  turret(world, pos, b2v(3.15f, 3.15f), b2v(5.24f, 0.3f), 0.82f), debug(v2f(60.f, 1.f))
+Tank::Tank(int joy, b2World* world, const b2v & size, const b2v & pos, const sf::Color & clr, float turtorque, Chassis* chas, Turret* tur, Tread* ltr, Tread *rtr)
 {
+	chassis = chas;
+	turret = tur;
+	ltread = ltr;
+	rtread = rtr;
+
 	joystick = joy;
 	middley = size.y / 2.f; // half the width of the tank
 	left = 0.f; // left tread percent
@@ -17,46 +20,19 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 	turn = 0.f;
 	turret_speed = 1.f;
 	firing = false;
-	shot_impulse = 30000.f;
-	shot_size = 0.3f;
 
-	chassisRect.setOrigin(b2v2v2f(size) / 2.0f);
-	chassisRect.setFillColor(clr);
-
-	debug.setOrigin(0.f, 0.5f);
-	debug.setFillColor(sf::Color(0, 255, 0));
-
-	/***** Box2D *****/
-
-	// create chassis
-	b2BodyDef chassisBody;
-	chassisBody.type = b2_dynamicBody;
-	chassisBody.position.Set(0.f, 0.f);
-
-	b2PolygonShape chassisBox;
-	chassisBox.SetAsBox(size.x / 2.f, size.y / 2.f);
-
-	b2FixtureDef chassisFixture;
-	chassisFixture.shape = &chassisBox;
-	chassisFixture.density = 771.f;
-	chassisFixture.friction = 0.3f;
-	chassisFixture.filter.categoryBits = CATEGORY_TANK;
-	chassisFixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
-
-	chassis = world->CreateBody(&chassisBody);
-	chassis->CreateFixture(&chassisFixture);
-
-	chassis->SetUserData(this);
 	// TODO can be passed to constructor?
-	turret.SetUserData(this);
-	ltread.SetUserData(this);
-	rtread.SetUserData(this);
+	chassis->SetUserData(this);
+	turret->SetUserData(this);
+	ltread->SetUserData(this);
+	rtread->SetUserData(this);
 
+	b2Body* body = chassis->get_body();
 	// attach turret
 	b2RevoluteJointDef turretJoint;
-	turretJoint.Initialize(chassis, turret.get_body(), chassis->GetWorldCenter());
+	turretJoint.Initialize(body, turret->get_body(), body->GetWorldCenter());
 	// TODO simulate joint friction
-	turretJoint.maxMotorTorque = 100000.f;
+	turretJoint.maxMotorTorque = turtorque;
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
@@ -64,19 +40,20 @@ Tank::Tank(int joy, b2World* world, b2Body* ground, const b2v & size, const b2v 
 
 	// attach treads
 	b2WeldJointDef lweld;
-	lweld.Initialize(chassis, ltread.get_body(), b2v(0.f, size.y / 2.f));
+	lweld.Initialize(body, ltread->get_body(), b2v(0.f, size.y / 2.f));
 	world->CreateJoint(&lweld);
 
 	b2WeldJointDef rweld;
-	rweld.Initialize(chassis, rtread.get_body(), b2v(0.f, -size.y / 2.f));
+	rweld.Initialize(body, rtread->get_body(), b2v(0.f, -size.y / 2.f));
 	world->CreateJoint(&rweld);
-
-	std::cerr << "Tank Mass: " << chassis->GetMass() << "\n";
 }
 
 Tank::~Tank()
 {
-	chassis->GetWorld()->DestroyBody(chassis);
+	delete chassis;
+	delete turret;
+	delete ltread;
+	delete rtread;
 }
 
 void Tank::bind(sf::Event & event)
@@ -93,20 +70,17 @@ void Tank::bind(sf::Event & event)
 
 void Tank::update()
 {
-	chassisRect.setPosition(b2v2v2f(chassis->GetPosition()));
-	chassisRect.setRotation(rad2deg(chassis->GetAngle()));
-
-	turret.update();
-
-	ltread.update();
-	rtread.update();
+	chassis->update();
+	turret->update();
+	ltread->update();
+	rtread->update();
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const
 {
-	ltread.draw_on(window);
-	rtread.draw_on(window);
-	window.draw(chassisRect);
+	ltread->draw_on(window);
+	rtread->draw_on(window);
+	chassis->draw_on(window);
 }
 
 void Tank::read_controller()
@@ -125,8 +99,8 @@ void Tank::read_controller()
 
 void Tank::move()
 {
-	ltread.power(left);
-	rtread.power(right);
+	ltread->power(left);
+	rtread->power(right);
 
 	joint->SetMotorSpeed(turn * turret_speed);
 	// TODO need to cancel out momentum/prevent buildup of speed
@@ -134,18 +108,10 @@ void Tank::move()
 		joint->SetMaxMotorTorque(1000000.f);
 	else
 		joint->SetMaxMotorTorque(100000.f);
-
-	debug.setRotation(chassisRect.getRotation());
-	debug.setPosition(chassisRect.getPosition());
 }
 
 Projectile* Tank::fire()
 {
 	firing = false;
-
-	b2Body* tur = turret.get_body();
-	b2v fwd_norm = tur->GetWorldVector(b2v(-1.f, 0.f));
-	tur->ApplyLinearImpulse(b2v(fwd_norm.x * shot_impulse, fwd_norm.y * shot_impulse), tur->GetWorldCenter());
-
-	return new Projectile(chassis->GetWorld(), this, turret.tip(), turret.get_body()->GetAngle(), shot_impulse, b2v(shot_size * 3, shot_size));
+	return turret->fire();
 }

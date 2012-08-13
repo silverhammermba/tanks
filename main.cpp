@@ -6,6 +6,7 @@
 #include <SFML/Window.hpp>
 #include <Box2D/Box2D.h>
 #include "helpers.hpp"
+#include "factory.hpp"
 #include "tank.hpp"
 #include "projectile.hpp"
 #include "particle.hpp"
@@ -40,6 +41,8 @@ int main(int argc, char *argv[])
 	sf::Clock pclock; // physics clock
 	sf::Clock clock; // accumulative clock
 	float timescale = 1.f;
+
+	Factory::Tank factory("tankdef.yaml");
 
 	sf::Text fps;
 	fps.setScale(1.f, -1.f);
@@ -83,6 +86,8 @@ int main(int argc, char *argv[])
 	//b2v gunSize(5.24f, 0.3f);
 
 	b2World world(b2Vec2(0.0f, 0.0f));
+
+	Factory::world = &world;
 
 	ShotListener listener;
 	world.SetContactListener(&listener);
@@ -168,7 +173,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, &world, ground, bodySize, b2v(0, 0), sf::Color(rand_i(256), rand_i(256), rand_i(256))));
+					players.push_back(factory.produce(event.joystickButton.joystickId, b2v(0, 0)));
 			}
 			else
 			{
@@ -236,7 +241,7 @@ int main(int argc, char *argv[])
 			(*player)->draw_on(window);
 
 		for (auto player = players.begin(); player != players.end(); player++)
-			(*player)->get_turret().draw_on(window);
+			(*player)->get_turret()->draw_on(window);
 
 		for (auto shot = shots.begin(); shot != shots.end(); shot++)
 		{

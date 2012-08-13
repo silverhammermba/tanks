@@ -1,10 +1,11 @@
 #include <iostream>
 #include "tread.hpp"
 
-Tread::Tread(b2World* world, b2v size, b2v pos) : rect(b2v2v2f(size))
+Tread::Tread(b2World* world, b2v size, b2v pos, float mforce, float density)
+	: rect(b2v2v2f(size))
 {
 	// TODO too sluggish
-	max_force = 18837.f * 2;
+	max_force = mforce;
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
@@ -16,7 +17,7 @@ Tread::Tread(b2World* world, b2v size, b2v pos) : rect(b2v2v2f(size))
 	b2FixtureDef fixture;
 	fixture.shape = &polygon;
 	// 7.48 tons
-	fixture.density = 1383.f;
+	fixture.density = density;
 	fixture.friction = 0.3;
 	fixture.filter.categoryBits = CATEGORY_TANK;
 	fixture.filter.maskBits = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;

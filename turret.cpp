@@ -1,8 +1,12 @@
 #include <iostream>
 #include "turret.hpp"
 
-Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset) : bodyRect(b2v2v2f(bodySize)), gunRect(b2v2v2f(gunSize))
+Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize)
+	: bodyRect(b2v2v2f(bodySize)), gunRect(b2v2v2f(gunSize))
 {
+	float shot_impulse = imp;
+	float shot_size = shsize;
+
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position.Set(pos.x, pos.y);
@@ -13,7 +17,7 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 	b2FixtureDef bodyFixture;
 	bodyFixture.shape = &bodyBox;
 	// 11.67 tons
-	bodyFixture.density = 976.f;
+	bodyFixture.density = density;
 	bodyFixture.friction = 0.3;
 	bodyFixture.filter.categoryBits = CATEGORY_TURRET;
 	bodyFixture.filter.maskBits = CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
@@ -24,7 +28,7 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 	b2FixtureDef gunFixture;
 	gunFixture.shape = &gunBox;
 	// total guess...
-	gunFixture.density = 218.f;
+	gunFixture.density = gdensity;
 	gunFixture.friction = 0.3;
 	gunFixture.filter.categoryBits = CATEGORY_TURRET;
 	gunFixture.filter.maskBits = CATEGORY_TURRET | CATEGORY_WALL;
@@ -72,3 +76,12 @@ b2v Turret::tip() const
 	return body->GetWorldPoint(b2v(6.06f, 0.f));
 }
 
+
+Projectile* Turret::fire()
+{
+	// recoil
+	b2v fwd_norm = body->GetWorldVector(b2v(-1.f, 0.f));
+	body->ApplyLinearImpulse(b2v(fwd_norm.x * shot_impulse, fwd_norm.y * shot_impulse), body->GetWorldCenter());
+
+	return new Projectile(body->GetWorld(), (Tank*)body->GetUserData(), tip(), body->GetAngle(), shot_impulse, b2v(shot_size * 3, shot_size));
+}
