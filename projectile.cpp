@@ -1,5 +1,4 @@
-#include <iostream>
-#include "projectile.hpp"
+#include "engine.hpp"
 
 Projectile::Projectile(b2World* world, Tank *own, const b2v pos, float dir, float impulse, b2v size)
 	: rect(b2v2v2f(size))

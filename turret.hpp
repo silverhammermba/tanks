@@ -1,14 +1,6 @@
 #ifndef TURRET_H_
 #define TURRET_H_
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "entity.hpp"
-#include "tank.hpp"
-#include "projectile.hpp"
-
 class Projectile;
 
 class Turret : public Entity

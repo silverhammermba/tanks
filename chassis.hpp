@@ -1,12 +1,6 @@
 #ifndef CHASSIS_H_
 #define CHASSIS_H_
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "entity.hpp"
-
 class Chassis : public Entity
 {
 	sf::RectangleShape rect;
@@ -30,4 +24,3 @@ public:
 };
 
 #endif
-

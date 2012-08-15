@@ -1,11 +1,6 @@
 #ifndef WALL_H_
 #define WALL_H_
 
-#include <SFML/Graphics.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "entity.hpp"
-
 class Wall : public Entity
 {
 	sf::RectangleShape rect;

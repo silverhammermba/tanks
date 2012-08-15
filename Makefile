@@ -1,36 +1,36 @@
 all: tanks
 
-tanks: main.o factory.o tank.o projectile.o tread.o turret.o wall.o particle.o helpers.o
-	g++ -o launch main.o factory.o helpers.o tank.o projectile.o tread.o turret.o wall.o particle.o -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
+tanks: main.o chassis.o factory.o tank.o projectile.o tread.o turret.o wall.o particle.o engine.o
+	g++ -o launch main.o chassis.o factory.o engine.o tank.o projectile.o tread.o turret.o wall.o particle.o -lyaml-cpp -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
 
-main.o: main.cpp tank.o projectile.o wall.o particle.o helpers.o
+engine.o: engine.cpp engine.hpp entity.hpp tread.hpp chassis.hpp projectile.hpp turret.hpp factory.hpp tank.hpp particle.hpp wall.hpp
+	g++ -c engine.cpp -std=c++11
+
+main.o: engine.hpp
 	g++ -c main.cpp -std=c++11
 
-factory.o: tank.o tread.o turret.o helpers.o
+factory.o: factory.cpp engine.hpp
 	g++ -c factory.cpp -std=c++11
 
-helpers.o: helpers.cpp helpers.hpp
-	g++ -c helpers.cpp -std=c++11
-
-tank.o: tank.cpp tank.hpp chassis.o tread.o turret.o projectile.o entity.hpp helpers.o
+tank.o: tank.cpp engine.hpp
 	g++ -c tank.cpp -std=c++11
 
-projectile.o: projectile.cpp projectile.hpp entity.hpp helpers.o
+projectile.o: projectile.cpp engine.hpp
 	g++ -c projectile.cpp -std=c++11
 
-tread.o: tread.cpp tread.hpp entity.hpp helpers.o
+tread.o: tread.cpp engine.hpp
 	g++ -c tread.cpp -std=c++11
 
-chassis.o: chassis.cpp chassis.hpp entity.hpp helpers.o
+chassis.o: chassis.cpp engine.hpp
 	g++ -c chassis.cpp -std=c++11
 
-turret.o: turret.cpp turret.hpp entity.hpp helpers.o
+turret.o: turret.cpp engine.hpp
 	g++ -c turret.cpp -std=c++11
 
-wall.o: wall.cpp wall.hpp entity.hpp helpers.o
+wall.o: wall.cpp engine.hpp
 	g++ -c wall.cpp -std=c++11
 
-particle.o: particle.cpp particle.hpp helpers.o
+particle.o: particle.cpp engine.hpp
 	g++ -c particle.cpp -std=c++11
 
 clean:

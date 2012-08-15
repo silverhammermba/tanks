@@ -1,5 +1,4 @@
-#include <iostream>
-#include "turret.hpp"
+#include "engine.hpp"
 
 Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize)
 	: bodyRect(b2v2v2f(bodySize)), gunRect(b2v2v2f(gunSize))

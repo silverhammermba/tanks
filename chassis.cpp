@@ -1,4 +1,4 @@
-#include "chassis.hpp"
+#include "engine.hpp"
 
 Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float density, const b2v & tu_mount, float tu_torque, float tr_mount)
 	: rect(b2v2v2f(size))
@@ -30,6 +30,11 @@ Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float densit
 Chassis::~Chassis()
 {
 	body->GetWorld()->DestroyBody(body);
+}
+
+void Chassis::SetUserData(void* ptr)
+{
+	body->SetUserData(ptr);
 }
 
 void Chassis::update()

@@ -1,12 +1,6 @@
 #ifndef PROJECTILE_H_
 #define PROJECTILE_H_
 
-#include <SFML/Graphics.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "entity.hpp"
-#include "tank.hpp"
-
 class Tank;
 
 class Projectile : public Entity

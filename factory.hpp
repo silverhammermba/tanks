@@ -1,21 +1,13 @@
 #ifndef FACTORY_H_
 #define FACTORY_H_
 
-#include <string>
-#include <fstream>
-#include <yaml-cpp/yaml.h>
-#include "helpers.hpp"
-#include "tread.hpp"
-#include "turret.hpp"
-#include "chassis.hpp"
-
 class Turret;
 class Tread;
 class Chassis;
 
 namespace Factory
 {
-	b2World* world;
+	extern b2World* world;
 
 	class Tread
 	{

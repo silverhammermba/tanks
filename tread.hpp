@@ -1,12 +1,6 @@
 #ifndef TREAD_H_
 #define TREAD_H_
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "entity.hpp"
-
 class Tread : public Entity
 {
 	float max_force;

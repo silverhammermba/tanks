@@ -1,15 +1,37 @@
-#ifndef HELPERS_H_
-#define HELPERS_H_
+#ifndef ENGINE_H_
+#define ENGINE_H_
 
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <sstream>
+#include <string>
 #include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
-
-const float ppm = 7.5f; // pixels per meter
+#include <yaml-cpp/yaml.h>
 
 enum entity_t {TANK, WALL, SHOT};
+
+typedef sf::Vector2f v2f;
+typedef b2Vec2 b2v;
+
+#include "entity.hpp"
+#include "tread.hpp"
+#include "chassis.hpp"
+#include "projectile.hpp"
+#include "turret.hpp"
+#include "factory.hpp"
+#include "tank.hpp"
+#include "particle.hpp"
+#include "wall.hpp"
+
+const float ppm = 7.5f; // pixels per meter
 
 const short CATEGORY_TANK = 1 << 0;
 const short CATEGORY_WALL = 1 << 1;
@@ -17,11 +39,6 @@ const short CATEGORY_GROUND = 1 << 2;
 const short CATEGORY_TURRET = 1 << 3;
 const short CATEGORY_SHOT = 1 << 4;
 const short CATEGORY_SMOKE = 1 << 5;
-const short CATEGORY_PLAYERS = 0xf << 6;
-#define CATEGORY_PLAYER(n) (1 << (6 + n))
-
-typedef sf::Vector2f v2f;
-typedef b2Vec2 b2v;
 
 float rand_f(float max);
 float rand_i(int max);

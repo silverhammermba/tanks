@@ -1,10 +1,6 @@
 #ifndef PARTICLE_H_
 #define PARTICLE_H_
 
-#include <SFML/Graphics.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-
 class Particle
 {
 	float lifetime;

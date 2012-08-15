@@ -1,4 +1,4 @@
-#include "factory.hpp"
+#include "engine.hpp"
 
 void operator >> (const YAML::Node& node, b2v & v)
 {
@@ -8,6 +8,8 @@ void operator >> (const YAML::Node& node, b2v & v)
 
 namespace Factory
 {
+	b2World* world;
+
 	Tread::Tread(const std::string & name)
 	{
 		std::ifstream fin(name);
@@ -22,6 +24,8 @@ namespace Factory
 			def["force"] >> max_force;
 		}
 	}
+
+	Tread::~Tread() {}
 
 	::Tread* Tread::produce(const b2v & pos) const
 	{
@@ -48,6 +52,8 @@ namespace Factory
 		}
 	}
 
+	Turret::~Turret() {}
+
 	::Turret* Turret::produce(const b2v & pos) const
 	{
 		return new ::Turret(world, pos, size, gun_size, gun_offset, density, gun_density, impulse, shot_size);
@@ -69,6 +75,8 @@ namespace Factory
 			def["tread mount"] >> tread_mount;
 		}
 	}
+
+	Chassis::~Chassis() {}
 
 	::Chassis* Chassis::produce(const b2v & pos) const
 	{

@@ -1,17 +1,6 @@
 #ifndef TANK_H_
 #define TANK_H_
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "entity.hpp"
-#include "factory.hpp"
-#include "projectile.hpp"
-#include "tread.hpp"
-#include "turret.hpp"
-#include "chassis.hpp"
-
 class Projectile;
 class Turret;
 

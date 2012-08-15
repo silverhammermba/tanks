@@ -1,5 +1,4 @@
-#include <iostream>
-#include "tread.hpp"
+#include "engine.hpp"
 
 Tread::Tread(b2World* world, b2v size, b2v pos, float mforce, float density)
 	: rect(b2v2v2f(size))

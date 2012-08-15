@@ -1,16 +1,4 @@
-#include <iostream>
-#include <sstream>
-#include <list>
-#include <ctime>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <Box2D/Box2D.h>
-#include "helpers.hpp"
-#include "factory.hpp"
-#include "tank.hpp"
-#include "projectile.hpp"
-#include "particle.hpp"
-#include "wall.hpp"
+#include "engine.hpp"
 
 using std::cin;
 using std::cerr;
