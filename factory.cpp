@@ -1,14 +1,26 @@
 #include "factory.hpp"
 
+void operator >> (const YAML::Node& node, b2v & v)
+{
+	node[0] >> v.x;
+	node[0] >> v.y;
+}
+
 namespace Factory
 {
 	Tread::Tread(const std::string & name)
 	{
-		YAML::Node def = YAML::LoadFile(name);
+		std::ifstream fin(name);
+		YAML::Parser parser(fin);
 
-		size = def["size"].as<b2v>();
-		max_force = def["force"].as<float>();
-		density = def["weight"].as<float>() / (size.x * size.y);
+		YAML::Node def;
+		if (parser.GetNextDocument(def))
+		{
+			def["size"] >> size;
+			def["weight"] >> density;
+			density /= size.x * size.y;
+			def["force"] >> max_force;
+		}
 	}
 
 	::Tread* Tread::produce(const b2v & pos) const
@@ -18,15 +30,22 @@ namespace Factory
 
 	Turret::Turret(const std::string & name)
 	{
-		YAML::Node def = YAML::LoadFile(name);
+		std::ifstream fin(name);
+		YAML::Parser parser(fin);
 
-		size = def["size"].as<b2v>();
-		gun_size = def["gun size"].as<b2v>();
-		gun_offset = def["offset"].as<float>();
-		density = def["weight"].as<float>() / (size.x * size.y);
-		gun_density = def["gun weight"].as<float>() / (gun_size.x * gun_size.y);
-		impulse = def["impulse"].as<float>();
-		shot_size = def["shot size"].as<float>();
+		YAML::Node def;
+		if (parser.GetNextDocument(def))
+		{
+			def["size"] >> size;
+			def["weight"] >> density;
+			density /= size.x * size.y;
+			def["gun size"] >> gun_size;
+			def["gun weight"] >> gun_density;
+			gun_density /= size.x * size.y;
+			def["gun offset"] >> gun_offset;
+			def["impulse"] >> impulse;
+			def["shot size"] >> shot_size;
+		}
 	}
 
 	::Turret* Turret::produce(const b2v & pos) const
@@ -36,15 +55,23 @@ namespace Factory
 
 	Chassis::Chassis(const std::string & name)
 	{
-		YAML::Node def = YAML::LoadFile(name);
+		std::ifstream fin(name);
+		YAML::Parser parser(fin);
 
-		size = def["size"].as<b2v>();
-		density = def["weight"].as<float>() / (size.x * size.y);
+		YAML::Node def;
+		if (parser.GetNextDocument(def))
+		{
+			def["size"] >> size;
+			def["weight"] >> density;
+			density /= size.x * size.y;
+			def["turret mount"] >> turret_mount;
+			def["turret torque"] >> turret_torque;
+			def["tread mount"] >> tread_mount;
+		}
 	}
 
 	::Chassis* Chassis::produce(const b2v & pos) const
 	{
-		sf::Color color(0, 0, 0);
-		return new ::Chassis(world, pos, size, density, color);
+		return new ::Chassis(world, pos, size, density, turret_mount, turret_torque, tread_mount);
 	}
 }

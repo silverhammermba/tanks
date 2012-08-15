@@ -2,37 +2,16 @@
 #define FACTORY_H_
 
 #include <string>
+#include <fstream>
 #include <yaml-cpp/yaml.h>
 #include "helpers.hpp"
 #include "tread.hpp"
 #include "turret.hpp"
-#include "tank.hpp"
+#include "chassis.hpp"
 
-namespace YAML
-{
-	template<> struct convert<b2v>
-	{
-		static Node encode(const b2v & rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			return node;
-		}
-
-		static bool decode(const Node & node, b2v & rhs)
-		{
-			if (!node.IsSequence())
-				return false;
-			if (!node.size() == 2)
-				return false;
-			
-			rhs.x = node[0].as<double>();
-			rhs.y = node[1].as<double>();
-			return true;
-		}
-	};
-}
+class Turret;
+class Tread;
+class Chassis;
 
 namespace Factory
 {
@@ -66,16 +45,18 @@ namespace Factory
 		::Turret* produce(const b2v & pos) const;
 	};
 
-	class Tank
+	class Chassis
 	{
-		b2v chassis_size;
+		b2v size;
 		float density;
+		b2v turret_mount;
 		float turret_torque;
+		float tread_mount;
 	public:
-		Tank(const std::string & name);
-		~Tank();
+		Chassis(const std::string & name);
+		~Chassis();
 
-		::Tank* produce(int joystick, const b2v & pos) const;
+		::Chassis* produce(const b2v & pos) const;
 	};
 }
 
