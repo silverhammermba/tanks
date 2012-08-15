@@ -42,7 +42,9 @@ int main(int argc, char *argv[])
 	sf::Clock clock; // accumulative clock
 	float timescale = 1.f;
 
-	Factory::Tank factory("tankdef.yaml");
+	Factory::Tread tread("tread.yaml");
+	Factory::Turret turret("turret.yaml");
+	Factory::Chassis chassis("chassis.yaml");
 
 	sf::Text fps;
 	fps.setScale(1.f, -1.f);
@@ -173,7 +175,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(factory.produce(event.joystickButton.joystickId, b2v(0, 0)));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), chassis, turret, tread));
 			}
 			else
 			{
