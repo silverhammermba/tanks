@@ -42,7 +42,7 @@ namespace Factory
 		b2v size;
 		float density;
 		b2v turret_mount;
-		float turret_torque;
+		float turret_speed;
 		float tread_mount;
 	public:
 		Chassis(const std::string & name);

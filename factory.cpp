@@ -43,12 +43,12 @@ namespace Factory
 			def["size"] >> size;
 			def["weight"] >> density;
 			density /= size.x * size.y;
-			def["gun size"] >> gun_size;
-			def["gun weight"] >> gun_density;
+			def["gun_size"] >> gun_size;
+			def["gun_weight"] >> gun_density;
 			gun_density /= size.x * size.y;
-			def["gun offset"] >> gun_offset;
+			def["gun_offset"] >> gun_offset;
 			def["impulse"] >> impulse;
-			def["shot size"] >> shot_size;
+			def["shot_size"] >> shot_size;
 		}
 	}
 
@@ -70,9 +70,9 @@ namespace Factory
 			def["size"] >> size;
 			def["weight"] >> density;
 			density /= size.x * size.y;
-			def["turret mount"] >> turret_mount;
-			def["turret torque"] >> turret_torque;
-			def["tread mount"] >> tread_mount;
+			def["turret_mount"] >> turret_mount;
+			def["turret_speed"] >> turret_speed;
+			def["tread_mount"] >> tread_mount;
 		}
 	}
 
@@ -80,6 +80,6 @@ namespace Factory
 
 	::Chassis* Chassis::produce(const b2v & pos) const
 	{
-		return new ::Chassis(world, pos, size, density, turret_mount, turret_torque, tread_mount);
+		return new ::Chassis(world, pos, size, density, turret_mount, turret_speed, tread_mount);
 	}
 }

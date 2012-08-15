@@ -6,15 +6,15 @@ class Chassis : public Entity
 	sf::RectangleShape rect;
 	b2Body* body;
 	b2v turret_mount;
-	float turret_torque;
+	float turret_speed;
 	float tread_mount;
 public:
-	Chassis(b2World* world, const b2v & pos, const b2v & size, float density, const b2v & tu_mount, float tu_torque, float tr_mount);
+	Chassis(b2World* world, const b2v & pos, const b2v & size, float density, const b2v & tu_mount, float tu_speed, float tr_mount);
 	~Chassis();
 
 	entity_t type() const { return TANK; };
 	b2v get_turret_mount() { return turret_mount; };
-	float get_turret_torque() { return turret_torque; };
+	float get_turret_speed() { return turret_speed; };
 	float get_tread_mount() { return tread_mount; };
 	void startContact() {};
 	void SetUserData(void* ptr);

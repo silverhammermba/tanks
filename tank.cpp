@@ -21,7 +21,7 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	left = 0.f; // left tread percent
 	right = 0.f; // right tread percent
 	turn = 0.f;
-	turret_speed = 1.f;
+	turret_speed = chassis->get_turret_speed();
 	firing = false;
 
 	// TODO can be passed to constructor?
@@ -35,7 +35,7 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	b2RevoluteJointDef turretJoint;
 	turretJoint.Initialize(body, turret->get_body(), turret_pos);
 	// TODO simulate joint friction
-	turretJoint.maxMotorTorque = chassis->get_turret_torque();
+	turretJoint.maxMotorTorque = 100000.f;
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
