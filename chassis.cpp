@@ -1,10 +1,13 @@
 #include "chassis.hpp"
 
-Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float density, const sf::Color & clr)
+Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float density, const b2v & tu_mount, float tu_torque, float tr_mount)
 	: rect(b2v2v2f(size))
 {
+	turret_mount = tu_mount;
+	tread_mount = tr_mount;
+
 	rect.setOrigin(rect.getSize() / 2.0f);
-	rect.setFillColor(clr);
+	rect.setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
