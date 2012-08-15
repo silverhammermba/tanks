@@ -6,15 +6,19 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* world, const b2v & size, const b2v & pos, const sf::Color & clr, float turtorque, Chassis* chas, Turret* tur, Tread* ltr, Tread *rtr)
+Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact)
 {
-	chassis = chas;
-	turret = tur;
-	ltread = ltr;
-	rtread = rtr;
+	chassis = ch_fact.produce(pos);
+
+	b2v turret_pos = pos + chassis->get_turret_mount();
+	turret = tu_fact.produce(turret_pos);
+
+	b2v ltread_pos = pos + b2v(0, chassis->get_tread_mount());
+	b2v rtread_pos = pos + b2v(0, -chassis->get_tread_mount());
+	ltread = tr_fact.produce(ltread_pos);
+	rtread = tr_fact.produce(rtread_pos);
 
 	joystick = joy;
-	middley = size.y / 2.f; // half the width of the tank
 	left = 0.f; // left tread percent
 	right = 0.f; // right tread percent
 	turn = 0.f;
@@ -30,9 +34,9 @@ Tank::Tank(int joy, b2World* world, const b2v & size, const b2v & pos, const sf:
 	b2Body* body = chassis->get_body();
 	// attach turret
 	b2RevoluteJointDef turretJoint;
-	turretJoint.Initialize(body, turret->get_body(), body->GetWorldCenter());
+	turretJoint.Initialize(body, turret->get_body(), turret_pos);
 	// TODO simulate joint friction
-	turretJoint.maxMotorTorque = turtorque;
+	turretJoint.maxMotorTorque = chassis->get_turret_torque();
 	turretJoint.motorSpeed = 0.0f;
 	turretJoint.enableMotor = true;
 
@@ -40,11 +44,11 @@ Tank::Tank(int joy, b2World* world, const b2v & size, const b2v & pos, const sf:
 
 	// attach treads
 	b2WeldJointDef lweld;
-	lweld.Initialize(body, ltread->get_body(), b2v(0.f, size.y / 2.f));
+	lweld.Initialize(body, ltread->get_body(), ltread_pos);
 	world->CreateJoint(&lweld);
 
 	b2WeldJointDef rweld;
-	rweld.Initialize(body, rtread->get_body(), b2v(0.f, -size.y / 2.f));
+	rweld.Initialize(body, rtread->get_body(), rtread_pos);
 	world->CreateJoint(&rweld);
 }
 

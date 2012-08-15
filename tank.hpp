@@ -6,6 +6,7 @@
 #include <Box2D/Box2D.h>
 #include "helpers.hpp"
 #include "entity.hpp"
+#include "factory.hpp"
 #include "projectile.hpp"
 #include "tread.hpp"
 #include "turret.hpp"
@@ -22,7 +23,6 @@ class Tank
 	static const float SPEED;
 
 	int joystick;
-	float middley;
 	float left;
 	float right;
 	float horsepower;
@@ -38,7 +38,7 @@ class Tank
 
 	b2RevoluteJoint* joint;
 public:
-	Tank(int joy, b2World* world, const b2v & size, const b2v & pos, const sf::Color & clr, float turtorque, Chassis* chas, Turret* tur, Tread* ltr, Tread *rtr);
+	Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact);
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };
