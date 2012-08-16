@@ -1,8 +1,6 @@
 #ifndef TURRET_H_
 #define TURRET_H_
 
-class Projectile;
-
 class Turret : public Entity
 {
 	b2Body* body;

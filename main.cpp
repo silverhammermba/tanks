@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
 	sf::Clock clock; // accumulative clock
 	float timescale = 1.f;
 
-	Factory::Tread tread("tread.yaml");
-	Factory::Turret turret("turret.yaml");
-	Factory::Chassis chassis("chassis.yaml");
+	Factory::Tread tread("yaml/tread.yaml");
+	Factory::Turret turret("yaml/turret.yaml");
+	Factory::Chassis chassis("yaml/chassis.yaml");
 
 	sf::Text fps;
 	fps.setScale(1.f, -1.f);

@@ -1,9 +1,6 @@
 #ifndef TANK_H_
 #define TANK_H_
 
-class Projectile;
-class Turret;
-
 class Tank
 {
 	static const float DEADZONE;

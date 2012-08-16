@@ -12,6 +12,7 @@ namespace Factory
 
 	Tread::Tread(const std::string & name)
 	{
+		std::cerr << "Loading " << name << "...\n";
 		std::ifstream fin(name);
 		YAML::Parser parser(fin);
 
@@ -34,6 +35,7 @@ namespace Factory
 
 	Turret::Turret(const std::string & name)
 	{
+		std::cerr << "Loading " << name << "...\n";
 		std::ifstream fin(name);
 		YAML::Parser parser(fin);
 
@@ -61,6 +63,7 @@ namespace Factory
 
 	Chassis::Chassis(const std::string & name)
 	{
+		std::cerr << "Loading " << name << "...\n";
 		std::ifstream fin(name);
 		YAML::Parser parser(fin);
 

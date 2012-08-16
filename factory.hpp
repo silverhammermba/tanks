@@ -1,10 +1,6 @@
 #ifndef FACTORY_H_
 #define FACTORY_H_
 
-class Turret;
-class Tread;
-class Chassis;
-
 namespace Factory
 {
 	extern b2World* world;
