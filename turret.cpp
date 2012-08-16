@@ -15,7 +15,6 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 
 	b2FixtureDef bodyFixture;
 	bodyFixture.shape = &bodyBox;
-	// 11.67 tons
 	bodyFixture.density = density;
 	bodyFixture.friction = 0.3;
 	bodyFixture.filter.categoryBits = CATEGORY_TURRET;
@@ -26,7 +25,6 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 
 	b2FixtureDef gunFixture;
 	gunFixture.shape = &gunBox;
-	// total guess...
 	gunFixture.density = gdensity;
 	gunFixture.friction = 0.3;
 	gunFixture.filter.categoryBits = CATEGORY_TURRET;

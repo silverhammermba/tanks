@@ -5,6 +5,7 @@ class ShotListener : public b2ContactListener
 public:
 	void BeginContact(b2Contact* contact)
 	{
+		/*
 		void* ent = contact->GetFixtureA()->GetBody()->GetUserData();
 		if (ent)
 			static_cast<Entity*>(ent)->startContact();
@@ -12,11 +13,11 @@ public:
 		ent = contact->GetFixtureB()->GetBody()->GetUserData();
 		if (ent)
 			static_cast<Entity*>(ent)->startContact();
+		*/
 	}
 };
 
 void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
-sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, float y);
 
 int main(int argc, char *argv[])
 {
@@ -25,10 +26,6 @@ int main(int argc, char *argv[])
 	sf::Clock pclock; // physics clock
 	sf::Clock clock; // accumulative clock
 	float timescale = 1.f;
-
-	Factory::Tread tread("yaml/tread.yaml");
-	Factory::Turret turret("yaml/turret.yaml");
-	Factory::Chassis chassis("yaml/chassis.yaml");
 
 	sf::Text fps;
 	fps.setScale(1.f, -1.f);
@@ -65,15 +62,12 @@ int main(int argc, char *argv[])
 
 	/***** Box2D *****/
 
-	// a Soviet T-72
-	b2v bodySize(6.95f, 3.69f);
-	// TODO currently hardcoded in Tank::Tank
-	//b2v turretSize(5.63f, 3.f);
-	//b2v gunSize(5.24f, 0.3f);
-
 	b2World world(b2Vec2(0.0f, 0.0f));
 
 	Factory::world = &world;
+	Factory::Tread tread("yaml/tread.yaml");
+	Factory::Turret turret("yaml/turret.yaml");
+	Factory::Chassis chassis("yaml/chassis.yaml");
 
 	ShotListener listener;
 	world.SetContactListener(&listener);
@@ -115,6 +109,9 @@ int main(int argc, char *argv[])
 
 	int velocityIterations = 6;
 	int positionIterations = 2;
+
+	// TODO testing
+	//players.push_back(new Tank(0 , &world, b2v(0, 0), chassis, turret, tread));
 
 	while (window.isOpen())
 	{
@@ -184,9 +181,8 @@ int main(int argc, char *argv[])
 		float ptime = pclock.getElapsedTime().asSeconds();
 		if (ptime >= timeStep)
 		{
-			std::cerr << "Starting physics step!\n";
-			std::cerr << shots.size() << " shots to process\n";
 			for (auto shot = shots.begin(); shot != shots.end(); shot++)
+			{
 				if ((*shot)->should_explode)
 				{
 					b2v pos = (*shot)->pos();
@@ -202,6 +198,7 @@ int main(int argc, char *argv[])
 					delete *shot;
 					shot = shots.erase(shot);
 				}
+			}
 
 			pclock.restart();
 			world.Step(ptime * timescale, velocityIterations, positionIterations);
@@ -212,6 +209,7 @@ int main(int argc, char *argv[])
 				(*shot)->update();
 			for (auto part = smoke.begin(); part != smoke.end(); part++)
 				(*part)->update(ptime * timescale);
+
 		}
 
 		fps_s.str("");
@@ -278,26 +276,4 @@ void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 	v2f topleft = window.convertCoords(sf::Vector2i(0, 0));
 	v2f botright = window.convertCoords(sf::Vector2i(window.getSize().x, window.getSize().y));
 	screen = sf::FloatRect(topleft.x, -topleft.y, botright.x - topleft.x, topleft.y - botright.y);
-}
-
-sf::RectangleShape* add_wall(b2Body *walls, float width, float height, float x, float y)
-{
-	b2PolygonShape box;
-	b2Vec2 size(width, height);
-	b2Vec2 pos(x, y);
-	box.SetAsBox(width / 2.f, height / 2.f, pos, 0);
-	b2FixtureDef fixture;
-	fixture.shape = &box;
-	fixture.filter.categoryBits = CATEGORY_WALL;
-	fixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_TURRET | CATEGORY_SHOT;
-
-	walls->CreateFixture(&fixture);
-	b2Vec2 wallPos = walls->GetPosition();
-
-	sf::RectangleShape* rect = new sf::RectangleShape(b2v2v2f(size));
-	rect->setOrigin(b2v2v2f(size) / 2.f);
-	rect->setFillColor(sf::Color(100, 100, 100));
-	rect->setPosition(b2v2v2f(wallPos + pos));
-
-	return rect;
 }
