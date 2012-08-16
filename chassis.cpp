@@ -26,6 +26,7 @@ Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float densit
 
 	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&fixture);
+	std::cerr << "Chassis Mass: " << body->GetMass() << "\n";
 }
 
 Chassis::~Chassis()

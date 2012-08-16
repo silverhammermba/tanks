@@ -1,9 +1,5 @@
 #include "engine.hpp"
 
-using std::cin;
-using std::cerr;
-using std::endl;
-
 class ShotListener : public b2ContactListener
 {
 public:
@@ -188,6 +184,8 @@ int main(int argc, char *argv[])
 		float ptime = pclock.getElapsedTime().asSeconds();
 		if (ptime >= timeStep)
 		{
+			std::cerr << "Starting physics step!\n";
+			std::cerr << shots.size() << " shots to process\n";
 			for (auto shot = shots.begin(); shot != shots.end(); shot++)
 				if ((*shot)->should_explode)
 				{
