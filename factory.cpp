@@ -20,7 +20,7 @@ namespace Factory
 		if (parser.GetNextDocument(def))
 		{
 			def["size"] >> size;
-			def["weight"] >> density;
+			def["mass"] >> density;
 			density /= size.x * size.y;
 			def["force"] >> max_force;
 		}
@@ -43,10 +43,10 @@ namespace Factory
 		if (parser.GetNextDocument(def))
 		{
 			def["size"] >> size;
-			def["weight"] >> density;
+			def["mass"] >> density;
 			density /= size.x * size.y;
 			def["gun_size"] >> gun_size;
-			def["gun_weight"] >> gun_density;
+			def["gun_mass"] >> gun_density;
 			gun_density /= size.x * size.y;
 			def["gun_offset"] >> gun_offset;
 			def["impulse"] >> impulse;
@@ -71,7 +71,7 @@ namespace Factory
 		if (parser.GetNextDocument(def))
 		{
 			def["size"] >> size;
-			def["weight"] >> density;
+			def["mass"] >> density;
 			density /= size.x * size.y;
 			def["turret_mount"] >> turret_mount;
 			def["turret_speed"] >> turret_speed;
