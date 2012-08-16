@@ -3,7 +3,7 @@
 void operator >> (const YAML::Node& node, b2v & v)
 {
 	node[0] >> v.x;
-	node[0] >> v.y;
+	node[1] >> v.y;
 }
 
 namespace Factory
