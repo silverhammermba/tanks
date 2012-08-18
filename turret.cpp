@@ -33,6 +33,7 @@ Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSiz
 	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&bodyFixture);
 	body->CreateFixture(&gunFixture);
+	body->SetUserData(this);
 
 	bodyRect.setOrigin(b2v2v2f(bodySize) / 2.f);
 	bodyRect.setFillColor(sf::Color(10, 10, 10));

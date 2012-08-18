@@ -25,10 +25,12 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	firing = false;
 
 	// TODO can be passed to constructor?
+	/*
 	chassis->SetUserData(this);
 	turret->SetUserData(this);
 	ltread->SetUserData(this);
 	rtread->SetUserData(this);
+	*/
 
 	b2Body* body = chassis->get_body();
 	// attach turret

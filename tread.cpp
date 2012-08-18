@@ -23,6 +23,7 @@ Tread::Tread(b2World* world, b2v size, b2v pos, float mforce, float density)
 
 	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&fixture);
+	body->SetUserData(this);
 
 	rect.setOrigin(b2v2v2f(size) / 2.0f);
 	rect.setPosition(b2v2v2f(pos));
