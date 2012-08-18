@@ -3,8 +3,8 @@
 Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize)
 	: bodyRect(b2v2v2f(bodySize)), gunRect(b2v2v2f(gunSize))
 {
-	float shot_impulse = imp;
-	float shot_size = shsize;
+	shot_impulse = imp;
+	shot_size = shsize;
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
