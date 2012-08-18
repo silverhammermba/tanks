@@ -5,7 +5,6 @@ class ShotListener : public b2ContactListener
 public:
 	void BeginContact(b2Contact* contact)
 	{
-		/*
 		void* ent = contact->GetFixtureA()->GetBody()->GetUserData();
 		if (ent)
 			static_cast<Entity*>(ent)->startContact();
@@ -13,7 +12,6 @@ public:
 		ent = contact->GetFixtureB()->GetBody()->GetUserData();
 		if (ent)
 			static_cast<Entity*>(ent)->startContact();
-		*/
 	}
 };
 
