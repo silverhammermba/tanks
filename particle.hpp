@@ -3,6 +3,10 @@
 
 class Particle
 {
+	static const float START_SIZE;
+	static const float MAX_SIZE;
+
+	float max_size;
 	float lifetime;
 	float period;
 

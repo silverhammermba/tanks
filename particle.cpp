@@ -1,6 +1,9 @@
 #include "engine.hpp"
 
-Particle::Particle(b2World* world, b2v pos, b2v norm, short category) : circle(1.f)
+const float Particle::START_SIZE = 0.2f;
+const float Particle::MAX_SIZE = 3.f;
+
+Particle::Particle(b2World* world, b2v pos, b2v norm, short category) : circle(START_SIZE * ppm)
 {
 	lifetime = 0.5f + rand_f(1.5f);
 	period = lifetime;
@@ -11,7 +14,7 @@ Particle::Particle(b2World* world, b2v pos, b2v norm, short category) : circle(1
 	bodyDef.angle = (rand_f(2 * M_PI));
 	
 	b2CircleShape circ;
-	circ.m_radius = 1 / ppm;
+	circ.m_radius = START_SIZE;
 
 	b2FixtureDef fixture;
 	fixture.shape = &circ;
@@ -23,9 +26,12 @@ Particle::Particle(b2World* world, b2v pos, b2v norm, short category) : circle(1
 	body = world->CreateBody(&bodyDef);
 	body->CreateFixture(&fixture);
 	
-	circle.setOrigin(1.f, 1.f);
+	circle.setOrigin(START_SIZE * ppm, START_SIZE * ppm);
 	circle.setPosition(b2v2v2f(pos));
-	circle.setFillColor(sf::Color(255, 127 + rand_i(127), 0, 255));
+	int grey = rand_i(20);
+	circle.setFillColor(sf::Color(grey, grey, grey, 255));
+
+	max_size = 1.f + rand_f(MAX_SIZE - 1.f);
 
 	float impulse1 = 5.f + rand_f(15.f);
 	float impulse2 = 5.f + rand_f(15.f);
@@ -48,10 +54,11 @@ void Particle::update(float time)
 
 	lifetime -= time;
 
-	circle.setRadius(1.f + 10.f * sin(M_PI * lifetime / period));
+	circle.setRadius((START_SIZE + max_size * sin(M_PI * lifetime / period)) * ppm);
+	circle.setOrigin(circle.getRadius(), circle.getRadius());
 
 	sf::Color color = circle.getFillColor();
-	circle.setFillColor(sf::Color(color.r, color.g, color.b, 255 * lifetime / period));
+	circle.setFillColor(sf::Color(color.r, color.g, color.b, 255 * std::sqrt(lifetime / period)));
 }
 
 void Particle::draw_on(sf::RenderWindow & window) const
