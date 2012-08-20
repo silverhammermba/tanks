@@ -54,11 +54,12 @@ void Particle::update(float time)
 
 	lifetime -= time;
 
-	circle.setRadius((START_SIZE + max_size * sin(M_PI * lifetime / period)) * ppm);
+	float percent = lifetime / period;
+	circle.setRadius((START_SIZE + max_size * sin(M_PI * percent * percent)) * ppm);
 	circle.setOrigin(circle.getRadius(), circle.getRadius());
 
-	sf::Color color = circle.getFillColor();
-	circle.setFillColor(sf::Color(color.r, color.g, color.b, 255 * std::sqrt(lifetime / period)));
+	//sf::Color color = circle.getFillColor();
+	//circle.setFillColor(sf::Color(color.r, color.g, color.b, 255 * std::sqrt(percent)));
 }
 
 void Particle::draw_on(sf::RenderWindow & window) const
