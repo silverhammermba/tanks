@@ -31,7 +31,7 @@ typedef b2Vec2 b2v;
 #include "particle.hpp"
 #include "wall.hpp"
 
-const float ppm = 7.5f; // pixels per meter
+const float ppm = 8.f; // pixels per meter
 
 const short CATEGORY_TANK = 1 << 0;
 const short CATEGORY_WALL = 1 << 1;
