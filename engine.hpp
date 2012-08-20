@@ -2,6 +2,9 @@
 #define ENGINE_H_
 
 #define _USE_MATH_DEFINES
+#include <sys/types.h>
+#include <dirent.h>
+#include <cerrno>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
@@ -24,6 +27,7 @@ typedef b2Vec2 b2v;
 #include "entity.hpp"
 #include "tread.hpp"
 #include "chassis.hpp"
+#include "motor.hpp"
 #include "projectile.hpp"
 #include "turret.hpp"
 #include "factory.hpp"

@@ -1,8 +1,9 @@
 #include "engine.hpp"
 
-Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float density, const b2v & tu_mount, float tu_speed, float tr_mount)
+Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float density, float mo_mount, const b2v & tu_mount, float tu_speed, float tr_mount)
 	: rect(b2v2v2f(size))
 {
+	motor_mount = mo_mount;
 	turret_mount = tu_mount;
 	tread_mount = tr_mount;
 	turret_speed = tu_speed;

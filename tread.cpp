@@ -1,11 +1,8 @@
 #include "engine.hpp"
 
-Tread::Tread(b2World* world, b2v size, b2v pos, float mforce, float density)
+Tread::Tread(b2World* world, b2v size, b2v pos, float density)
 	: rect(b2v2v2f(size))
 {
-	// TODO too sluggish
-	max_force = mforce;
-
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position.Set(pos.x, pos.y);
@@ -70,6 +67,7 @@ void Tread::update_friction()
 	b2v impulse = body->GetMass() * -lateral_vel();
 	body->ApplyLinearImpulse(impulse, body->GetWorldCenter());
 
+	// TODO get accel force from motor, decel force from treads
 	// apply wheel friction
 	b2v fwd_norm = forward_vel();
 	float fwd_speed = fwd_norm.Normalize();
@@ -86,8 +84,9 @@ void Tread::SetUserData(void* ptr)
 	body->SetUserData(ptr);
 }
 
-void Tread::power(float percent)
+void Tread::power(float percent, float mforce)
 {
+	max_force = mforce;
 	force = max_force * percent / 100.f;
 
 	body->ApplyForce(body->GetWorldVector(b2Vec2(force, 0.f)), body->GetWorldCenter());

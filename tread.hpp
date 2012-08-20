@@ -3,8 +3,8 @@
 
 class Tread : public Entity
 {
-	float max_force;
 	float force;
+	float max_force;
 
 	b2Body* body;
 	sf::RectangleShape rect;
@@ -13,7 +13,7 @@ class Tread : public Entity
 	b2v forward_vel();
 	void update_friction();
 public:
-	Tread(b2World* world, b2v size, b2v pos, float mforce, float density);
+	Tread(b2World* world, b2v size, b2v pos, float density);
 	~Tread();
 
 	entity_t type() const { return TANK; };
@@ -22,7 +22,7 @@ public:
 	inline b2Body* get_body() const { return body; };
 	void update();
 	void draw_on(sf::RenderWindow & window) const;
-	void power(float percent);
+	void power(float percent, float mforce);
 };
 
 #endif

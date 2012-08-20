@@ -16,15 +16,15 @@ class Tank
 	float turret_speed;
 	bool firing;
 
-	sf::RectangleShape chassisRect;
 	Tread* ltread;
 	Tread* rtread;
 	Turret* turret;
 	Chassis* chassis;
+	Motor* motor;
 
 	b2RevoluteJoint* joint;
 public:
-	Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact);
+	Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact);
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };

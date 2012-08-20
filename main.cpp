@@ -54,18 +54,25 @@ int main(int argc, char *argv[])
 
 	sf::Event event;
 
-	std::list<Tank *> players;
-	std::list<Projectile *> shots;
-	std::list<Particle *> smoke;
-
-	/***** Box2D *****/
+	// lists for storing game objects
+	std::list<Tank*> players;
+	std::list<Projectile*> shots;
+	std::list<Particle*> smoke;
 
 	b2World world(b2Vec2(0.0f, 0.0f));
 
+	// factories for creating tanks
 	Factory::world = &world;
-	Factory::Tread tread("yaml/tread.yaml");
-	Factory::Turret turret("yaml/turret.yaml");
-	Factory::Chassis chassis("yaml/chassis.yaml");
+	
+	std::list<Factory::Chassis*> chasses;
+	std::list<Factory::Motor*> motors;
+	std::list<Factory::Tread*> treads;
+	std::list<Factory::Turret*> turrets;
+
+	Factory::load_dir("yaml/chasses", chasses);
+	Factory::load_dir("yaml/motors", motors);
+	Factory::load_dir("yaml/treads", treads);
+	Factory::load_dir("yaml/turrets", turrets);
 
 	ShotListener listener;
 	world.SetContactListener(&listener);
@@ -154,7 +161,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), chassis, turret, tread));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), *chasses.front(), *motors.front(), *turrets.front(), *treads.front()));
 			}
 			else
 			{

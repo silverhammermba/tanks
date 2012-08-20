@@ -5,9 +5,10 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact)
+Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact)
 {
 	chassis = ch_fact.produce(pos);
+	motor = mo_fact.produce(*chassis);
 
 	b2v turret_pos = pos + chassis->get_turret_mount();
 	turret = tu_fact.produce(turret_pos);
@@ -76,6 +77,7 @@ void Tank::bind(sf::Event & event)
 void Tank::update()
 {
 	chassis->update();
+	motor->update();
 	turret->update();
 	ltread->update();
 	rtread->update();
@@ -86,6 +88,7 @@ void Tank::draw_on(sf::RenderWindow & window) const
 	ltread->draw_on(window);
 	rtread->draw_on(window);
 	chassis->draw_on(window);
+	motor->draw_on(window);
 }
 
 void Tank::read_controller()
@@ -104,8 +107,9 @@ void Tank::read_controller()
 
 void Tank::move()
 {
-	ltread->power(left);
-	rtread->power(right);
+	float max_force = motor->get_max_force();
+	ltread->power(left, max_force);
+	rtread->power(right, max_force);
 
 	joint->SetMotorSpeed(turn * turret_speed);
 	// TODO need to cancel out momentum/prevent buildup of speed
