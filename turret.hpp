@@ -4,12 +4,13 @@
 class Turret : public Entity
 {
 	b2Body* body;
+	sf::Sprite sprite;
 	sf::RectangleShape bodyRect;
 	sf::RectangleShape gunRect;
 	float shot_impulse;
 	float shot_size;
 public:
-	Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize);
+	Turret(const sf::Texture & texture, b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize);
 	~Turret();
 
 	entity_t type() const { return TANK; };

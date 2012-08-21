@@ -3,14 +3,14 @@
 
 class Chassis : public Entity
 {
-	sf::RectangleShape rect;
+	sf::Sprite sprite;
 	b2Body* body;
 	b2v turret_mount;
 	float motor_mount;
 	float turret_speed;
 	float tread_mount;
 public:
-	Chassis(b2World* world, const b2v & pos, const b2v & size, float density, float mo_mount, const b2v & tu_mount, float tu_speed, float tr_mount);
+	Chassis(const sf::Texture & texture, b2World* world, const b2v & pos, const b2v & size, float density, float mo_mount, const b2v & tu_mount, float tu_speed, float tr_mount);
 	~Chassis();
 
 	entity_t type() const { return TANK; };

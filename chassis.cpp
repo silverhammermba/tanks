@@ -1,15 +1,15 @@
 #include "engine.hpp"
 
-Chassis::Chassis(b2World* world, const b2v & pos, const b2v & size, float density, float mo_mount, const b2v & tu_mount, float tu_speed, float tr_mount)
-	: rect(b2v2v2f(size))
+Chassis::Chassis(const sf::Texture & texture, b2World* world, const b2v & pos, const b2v & size, float density, float mo_mount, const b2v & tu_mount, float tu_speed, float tr_mount)
 {
+	sprite.setTexture(texture);
+	sprite.scale(2, 2);
+	sprite.setOrigin(v2f(sprite.getTexture()->getSize()) / 2.0f);
+
 	motor_mount = mo_mount;
 	turret_mount = tu_mount;
 	tread_mount = tr_mount;
 	turret_speed = tu_speed;
-
-	rect.setOrigin(rect.getSize() / 2.0f);
-	rect.setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
@@ -43,11 +43,11 @@ void Chassis::SetUserData(void* ptr)
 
 void Chassis::update()
 {
-	rect.setPosition(b2v2v2f(body->GetPosition()));
-	rect.setRotation(rad2deg(body->GetAngle()));
+	sprite.setPosition(b2v2v2f(body->GetPosition()));
+	sprite.setRotation(rad2deg(body->GetAngle()));
 }
 
 void Chassis::draw_on(sf::RenderWindow & window) const
 {
-	window.draw(rect);
+	window.draw(sprite);
 }

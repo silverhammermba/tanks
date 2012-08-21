@@ -1,8 +1,12 @@
 #include "engine.hpp"
 
-Turret::Turret(b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize)
+Turret::Turret(const sf::Texture & texture, b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize)
 	: bodyRect(b2v2v2f(bodySize)), gunRect(b2v2v2f(gunSize))
 {
+	sprite.setTexture(texture);
+	sprite.scale(2, 2);
+	sprite.setOrigin(v2f(sprite.getTexture()->getSize()) / 2.0f);
+
 	shot_impulse = imp;
 	shot_size = shsize;
 
@@ -56,6 +60,8 @@ void Turret::SetUserData(void* ptr)
 
 void Turret::update()
 {
+	sprite.setPosition(b2v2v2f(body->GetPosition()));
+	sprite.setRotation(rad2deg(body->GetAngle()));
 	bodyRect.setPosition(b2v2v2f(body->GetPosition()));
 	bodyRect.setRotation(rad2deg(body->GetAngle()));
 	gunRect.setPosition(b2v2v2f(body->GetPosition()));
@@ -64,6 +70,7 @@ void Turret::update()
 
 void Turret::draw_on(sf::RenderWindow & window) const
 {
+	window.draw(sprite);
 	window.draw(bodyRect);
 	window.draw(gunRect);
 }

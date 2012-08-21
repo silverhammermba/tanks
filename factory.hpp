@@ -30,11 +30,21 @@ namespace Factory
 		return 0;
 	}
 
-	class Chassis
+	class Factory
 	{
+	protected:
 		string name;
 		b2v size;
+		b2v origin;
 		float density;
+		sf::Texture texture;
+	public:
+		Factory(const std::string & filename);
+		~Factory();
+	};
+
+	class Chassis : Factory
+	{
 		b2v turret_mount;
 		float turret_speed;
 		float tread_mount;
@@ -46,11 +56,8 @@ namespace Factory
 		::Chassis* produce(const b2v & pos) const;
 	};
 
-	class Motor
+	class Motor : Factory
 	{
-		string name;
-		b2v size;
-		float density;
 		float max_force;
 	public:
 		Motor(const std::string & filename);
@@ -59,12 +66,9 @@ namespace Factory
 		::Motor* produce(::Chassis & chassis) const;
 	};
 
-	class Tread
+	class Tread : Factory
 	{
-		string name;
-		b2v size;
 		float max_force;
-		float density;
 	public:
 		Tread(const std::string & filename);
 		~Tread();
@@ -72,14 +76,11 @@ namespace Factory
 		::Tread* produce(const b2v & pos) const;
 	};
 
-	class Turret
+	class Turret : Factory
 	{
-		string name;
-		b2v size;
 		b2v gun_size;
-		float gun_offset;
-		float density;
 		float gun_density;
+		b2v gun_origin;
 		float impulse;
 		float shot_size;
 	public:

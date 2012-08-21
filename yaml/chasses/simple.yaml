@@ -1,7 +1,7 @@
 name: Simple
-size: [6.95, 3.69]
-mass: 18772
-turret_mount: [0, 0]
+size: [8.67, 6.68]
+mass: 20000
+turret_mount: [-1.7, -1.0]
 turret_speed: 1
-tread_mount: 1.845
-motor_mount: -2.0
+tread_mount: 2.88
+motor_mount: -3.75

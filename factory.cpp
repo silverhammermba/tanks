@@ -10,7 +10,18 @@ namespace Factory
 {
 	b2World* world;
 
-	Chassis::Chassis(const std::string & filename)
+	Factory::Factory(const std::string & filename)
+	{
+		std::string texture_name(filename);
+		texture_name.replace(texture_name.size() - 4, 4, "png").replace(0, 4, "graphics");
+		std::cerr << "Loading " << texture_name << "...\n";
+
+		texture.loadFromFile(texture_name);
+	}
+
+	Factory::~Factory() {}
+
+	Chassis::Chassis(const std::string & filename) : Factory(filename)
 	{
 		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
@@ -34,10 +45,10 @@ namespace Factory
 
 	::Chassis* Chassis::produce(const b2v & pos) const
 	{
-		return new ::Chassis(world, pos, size, density, motor_mount, turret_mount, turret_speed, tread_mount);
+		return new ::Chassis(texture, world, pos, size, density, motor_mount, turret_mount, turret_speed, tread_mount);
 	}
 
-	Motor::Motor(const std::string & filename)
+	Motor::Motor(const std::string & filename) : Factory(filename)
 	{
 		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
@@ -61,7 +72,7 @@ namespace Factory
 		return new ::Motor(chassis, size, density, max_force);
 	}
 
-	Tread::Tread(const std::string & filename)
+	Tread::Tread(const std::string & filename) : Factory(filename)
 	{
 		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
@@ -84,7 +95,7 @@ namespace Factory
 		return new ::Tread(world, size, pos, density);
 	}
 
-	Turret::Turret(const std::string & filename)
+	Turret::Turret(const std::string & filename) : Factory(filename)
 	{
 		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
@@ -97,10 +108,11 @@ namespace Factory
 			def["size"] >> size;
 			def["mass"] >> density;
 			density /= size.x * size.y;
+			def["origin"] >> origin;
 			def["gun_size"] >> gun_size;
 			def["gun_mass"] >> gun_density;
 			gun_density /= size.x * size.y;
-			def["gun_offset"] >> gun_offset;
+			def["gun_origin"] >> gun_offset;
 			def["impulse"] >> impulse;
 			def["shot_size"] >> shot_size;
 		}
@@ -110,6 +122,6 @@ namespace Factory
 
 	::Turret* Turret::produce(const b2v & pos) const
 	{
-		return new ::Turret(world, pos, size, gun_size, gun_offset, density, gun_density, impulse, shot_size);
+		return new ::Turret(texture, world, pos, size, gun_size, gun_offset, density, gun_density, impulse, shot_size);
 	}
 }
