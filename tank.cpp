@@ -18,6 +18,12 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	ltread = tr_fact.produce(ltread_pos);
 	rtread = tr_fact.produce(rtread_pos);
 
+	components.push_back(ltread);
+	components.push_back(rtread);
+	components.push_back(chassis);
+	components.push_back(motor);
+	components.push_back(turret);
+
 	joystick = joy;
 	left = 0.f; // left tread percent
 	right = 0.f; // right tread percent
@@ -76,19 +82,14 @@ void Tank::bind(sf::Event & event)
 
 void Tank::update()
 {
-	chassis->update();
-	motor->update();
-	turret->update();
-	ltread->update();
-	rtread->update();
+	for (auto c = components.begin(); c != components.end(); c++)
+		(*c)->update();
 }
 
 void Tank::draw_on(sf::RenderWindow & window) const
 {
-	ltread->draw_on(window);
-	rtread->draw_on(window);
-	chassis->draw_on(window);
-	motor->draw_on(window);
+	for (auto c = components.begin(); c != components.end(); c++)
+		(*c)->draw_on(window);
 }
 
 void Tank::read_controller()

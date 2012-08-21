@@ -16,6 +16,7 @@ class Tank
 	float turret_speed;
 	bool firing;
 
+	std::vector<Entity*> components;
 	Tread* ltread;
 	Tread* rtread;
 	Turret* turret;
