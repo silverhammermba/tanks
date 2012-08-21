@@ -12,6 +12,7 @@ public:
 
 	entity_t type() const { return WALL; };
 	void startContact() {};
+	void update() {};
 	void draw_on(sf::RenderWindow & window) const;
 };
 
