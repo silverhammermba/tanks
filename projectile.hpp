@@ -6,16 +6,10 @@ class Tank;
 class Projectile : public Entity
 {
 	Tank *owner;
-
-	b2Body* body;
-	sf::RectangleShape rect;
-
-	b2v velocity;
 public:
 	bool should_explode;
 
-	Projectile(b2World* world, Tank *own, const b2v pos, float dir, float sp, b2v size);
-	~Projectile();
+	Projectile(const sf::Texture & texture, const b2v & origin, const std::vector<b2FixtureDef*> fixtures, b2World* world, const b2v pos, float dir, Tank *own, float imp);
 
 	entity_t type() const { return SHOT; };
 	b2v pos() const { return body->GetPosition(); };
@@ -23,7 +17,7 @@ public:
 	void startContact();
 	void explode();
 	void update();
-	sf::FloatRect getGlobalBounds() const { return rect.getGlobalBounds(); };
+	sf::FloatRect getGlobalBounds() const { return sprite.getGlobalBounds(); };
 	void draw_on(sf::RenderWindow & window) const;
 };
 

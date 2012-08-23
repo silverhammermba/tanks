@@ -3,24 +3,19 @@
 
 class Turret : public Entity
 {
-	b2Body* body;
-	sf::Sprite sprite;
-	sf::RectangleShape bodyRect;
-	sf::RectangleShape gunRect;
 	float shot_impulse;
-	float shot_size;
 public:
-	Turret(const sf::Texture & texture, b2World* world, b2v pos, const b2v & bodySize, const b2v & gunSize, float gunOffset, float density, float gdensity, float imp, float shsize);
-	~Turret();
+	Turret(const sf::Texture & texture, const b2v origin, const std::vector<b2FixtureDef*> & fixtures, b2World* world, const b2v pos, float dir, float imp);
 
 	entity_t type() const { return TANK; };
 	void startContact() {};
 	void SetUserData(void* ptr);
 	inline b2Body* get_body() const { return body; };
+	inline float get_impulse() const { return shot_impulse; };
 	void update();
 	void draw_on(sf::RenderWindow & window) const;
 	b2v tip() const;
-	Projectile *fire();
+	void recoil();
 };
 
 #endif

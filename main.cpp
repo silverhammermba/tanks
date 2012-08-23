@@ -68,11 +68,13 @@ int main(int argc, char *argv[])
 	std::list<Factory::Motor*> motors;
 	std::list<Factory::Tread*> treads;
 	std::list<Factory::Turret*> turrets;
+	std::list<Factory::Projectile*> projectiles;
 
 	Factory::load_dir("yaml/chasses", chasses);
 	Factory::load_dir("yaml/motors", motors);
 	Factory::load_dir("yaml/treads", treads);
 	Factory::load_dir("yaml/turrets", turrets);
+	Factory::load_dir("yaml/projectiles", projectiles);
 
 	ShotListener listener;
 	world.SetContactListener(&listener);
@@ -161,7 +163,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), *chasses.front(), *motors.front(), *turrets.front(), *treads.front()));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), *chasses.front(), *motors.front(), *turrets.front(), *treads.front(), *projectiles.front()));
 			}
 			else
 			{

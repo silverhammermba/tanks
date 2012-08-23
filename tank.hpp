@@ -23,9 +23,11 @@ class Tank
 	Chassis* chassis;
 	Motor* motor;
 
+	Factory::Projectile* magazine;
+
 	b2RevoluteJoint* joint;
 public:
-	Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact);
+	Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact, Factory::Projectile & mg_fact);
 	~Tank();
 
 	inline int get_joystick() const { return joystick; };

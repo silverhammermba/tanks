@@ -2,6 +2,7 @@
 
 b2Body* Wall::body;
 
+Wall::Wall(const sf::Texture & texture, b2Body* world, const b2v pos, float dir)
 Wall::Wall(b2v size, b2v pos, float angle) : rect(b2v2v2f(size))
 {
 	b2PolygonShape box;

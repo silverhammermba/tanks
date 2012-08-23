@@ -1,7 +1,7 @@
 all: tanks
 
-tanks: main.o chassis.o motor.o factory.o tank.o projectile.o tread.o turret.o wall.o particle.o engine.o
-	g++ -ggdb -o launch main.o chassis.o motor.o factory.o engine.o tank.o projectile.o tread.o turret.o wall.o particle.o -lyaml-cpp -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
+tanks: main.o chassis.o motor.o entity.o factory.o tank.o projectile.o tread.o turret.o wall.o particle.o engine.o
+	g++ -ggdb -o launch main.o entity.o chassis.o motor.o factory.o engine.o tank.o projectile.o tread.o turret.o wall.o particle.o -lyaml-cpp -lBox2D -lsfml-graphics -lsfml-window -lsfml-system
 
 engine.o: engine.cpp engine.hpp entity.hpp tread.hpp chassis.hpp motor.hpp projectile.hpp turret.hpp factory.hpp tank.hpp particle.hpp wall.hpp
 	g++ -ggdb -c engine.cpp -std=c++11
@@ -14,6 +14,9 @@ factory.o: factory.cpp engine.o
 
 tank.o: tank.cpp engine.o
 	g++ -ggdb -c tank.cpp -std=c++11
+
+entity.o: entity.cpp entity.hpp
+	g++ -ggdb -c entity.cpp -std=c++11
 
 projectile.o: projectile.cpp engine.o
 	g++ -ggdb -c projectile.cpp -std=c++11

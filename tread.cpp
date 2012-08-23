@@ -1,52 +1,14 @@
 #include "engine.hpp"
 
-Tread::Tread(b2World* world, b2v size, b2v pos, float density)
-	: rect(b2v2v2f(size))
-{
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(pos.x, pos.y);
-
-	b2PolygonShape polygon;
-	polygon.SetAsBox(size.x / 2.f, size.y / 2.f);
-
-	b2FixtureDef fixture;
-	fixture.shape = &polygon;
-	// 7.48 tons
-	fixture.density = density;
-	fixture.friction = 0.3;
-	fixture.filter.categoryBits = CATEGORY_TANK;
-	fixture.filter.maskBits = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;
-
-	body = world->CreateBody(&bodyDef);
-	body->CreateFixture(&fixture);
-	body->SetUserData(this);
-
-	rect.setOrigin(b2v2v2f(size) / 2.0f);
-	rect.setPosition(b2v2v2f(pos));
-	rect.setFillColor(sf::Color(10, 10, 10));
-
-	std::cerr << "Tread Mass: " << body->GetMass() << "\n";
-}
-
-Tread::~Tread()
-{
-	body->GetWorld()->DestroyBody(body);
-}
+// TODO nicer way to do this?
+Tread::Tread(const sf::Texture & texture, const b2v origin, const std::vector<b2FixtureDef*> & fixtures, b2World* world, const b2v pos, float dir)
+	: Entity(texture, origin, fixtures, world, pos, dir) {}
 
 void Tread::update()
 {
 	update_friction();
-
-	rect.setPosition(b2v2v2f(body->GetPosition()));
-	rect.setRotation(rad2deg(body->GetAngle()));
+	Entity::update();
 }
-
-void Tread::draw_on(sf::RenderWindow & window) const
-{
-	window.draw(rect);
-}
-
 
 b2v Tread::lateral_vel()
 {

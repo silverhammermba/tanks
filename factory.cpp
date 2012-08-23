@@ -6,6 +6,22 @@ void operator >> (const YAML::Node& node, b2v & v)
 	node[1] >> v.y;
 }
 
+void operator >> (const YAML::Node& node, b2FixtureDef* fixture)
+{
+	const YAML::Node & verts = node["vertices"];
+	b2v vertices[verts.size()];
+	for (int i = 0; i < verts.size(); i++)
+	{
+		verts[i] >> vertices[i];
+	}
+	// TODO FREE THIS!
+	b2PolygonShape* polygon = new b2PolygonShape;
+	// pretty sure we don't need to keep vertices around
+	polygon->Set(vertices, verts.size());
+	fixture->shape = polygon;
+	node["density"] >> fixture->density;
+}
+
 namespace Factory
 {
 	b2World* world;
@@ -15,14 +31,8 @@ namespace Factory
 		std::string texture_name(filename);
 		texture_name.replace(texture_name.size() - 4, 4, "png").replace(0, 4, "graphics");
 		std::cerr << "Loading " << texture_name << "...\n";
-
 		texture.loadFromFile(texture_name);
-	}
 
-	Factory::~Factory() {}
-
-	Chassis::Chassis(const std::string & filename) : Factory(filename)
-	{
 		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
 		YAML::Parser parser(fin);
@@ -31,97 +41,149 @@ namespace Factory
 		if (parser.GetNextDocument(def))
 		{
 			def["name"] >> name;
-			def["size"] >> size;
-			def["mass"] >> density;
-			density /= size.x * size.y;
+			def["origin"] >> origin;
+			const YAML::Node & fixs = def["fixtures"];
+			for (int i = 0; i < fixs.size(); i++)
+			{
+				b2FixtureDef* fixture = new b2FixtureDef;
+				fixs[i] >> fixture;
+				fixtures.push_back(fixture);
+			}
+		}
+		// TODO raise error on else
+	}
+
+	Factory::~Factory()
+	{
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
+		{
+			delete (*fixt)->shape;
+			delete *fixt;
+		}
+	}
+
+	Chassis::Chassis(const std::string & filename) : Factory(filename)
+	{
+		std::ifstream fin(filename);
+		YAML::Parser parser(fin);
+
+		YAML::Node def;
+		if (parser.GetNextDocument(def))
+		{
 			def["turret_mount"] >> turret_mount;
 			def["turret_speed"] >> turret_speed;
 			def["tread_mount"] >> tread_mount;
 			def["motor_mount"] >> motor_mount;
 		}
+
+		// common fixture settings
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
+		{
+			(*fixt)->friction = 0.3f;
+			(*fixt)->filter.categoryBits = CATEGORY_TANK;
+			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
+		}
 	}
 
-	Chassis::~Chassis() {}
-
-	::Chassis* Chassis::produce(const b2v & pos) const
+	::Chassis* Chassis::produce(const b2v & pos, float dir) const
 	{
-		return new ::Chassis(texture, world, pos, size, density, motor_mount, turret_mount, turret_speed, tread_mount);
+		return new ::Chassis(texture, origin, fixtures, world, pos, dir, motor_mount, turret_mount, turret_speed, tread_mount);
 	}
 
 	Motor::Motor(const std::string & filename) : Factory(filename)
 	{
-		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
 		YAML::Parser parser(fin);
 
 		YAML::Node def;
 		if (parser.GetNextDocument(def))
 		{
-			def["name"] >> name;
-			def["size"] >> size;
-			def["mass"] >> density;
-			density /= size.x * size.y;
 			def["force"] >> max_force;
+		}
+
+		// common fixture settings
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
+		{
+			(*fixt)->friction = 0.3f;
+			(*fixt)->filter.categoryBits = CATEGORY_TANK;
+			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 		}
 	}
 
-	Motor::~Motor() {}
-
-	::Motor* Motor::produce(::Chassis & chassis) const
+	::Motor* Motor::produce(const b2v & pos, float dir) const
 	{
-		return new ::Motor(chassis, size, density, max_force);
+		return new ::Motor(texture, origin, fixtures, world, pos, dir, max_force);
 	}
 
 	Tread::Tread(const std::string & filename) : Factory(filename)
 	{
-		std::cerr << "Loading " << filename << "...\n";
-		std::ifstream fin(filename);
-		YAML::Parser parser(fin);
-
-		YAML::Node def;
-		if (parser.GetNextDocument(def))
+		// common fixture settings
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
 		{
-			def["name"] >> name;
-			def["size"] >> size;
-			def["mass"] >> density;
-			density /= size.x * size.y;
+			(*fixt)->friction = 0.3f;
+			(*fixt)->filter.categoryBits = CATEGORY_TANK;
+			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;
 		}
 	}
 
-	Tread::~Tread() {}
 
-	::Tread* Tread::produce(const b2v & pos) const
+	::Tread* Tread::produce(const b2v & pos, float dir) const
 	{
-		return new ::Tread(world, size, pos, density);
+		return new ::Tread(texture, origin, fixtures, world, pos, dir);
 	}
 
 	Turret::Turret(const std::string & filename) : Factory(filename)
 	{
-		std::cerr << "Loading " << filename << "...\n";
 		std::ifstream fin(filename);
 		YAML::Parser parser(fin);
 
 		YAML::Node def;
 		if (parser.GetNextDocument(def))
 		{
-			def["name"] >> name;
-			def["size"] >> size;
-			def["mass"] >> density;
-			density /= size.x * size.y;
-			def["origin"] >> origin;
-			def["gun_size"] >> gun_size;
-			def["gun_mass"] >> gun_density;
-			gun_density /= size.x * size.y;
-			def["gun_origin"] >> gun_offset;
 			def["impulse"] >> impulse;
-			def["shot_size"] >> shot_size;
+		}
+
+		// common fixture settings
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
+		{
+			(*fixt)->friction = 0.3f;
+			(*fixt)->filter.categoryBits = CATEGORY_TURRET;
+			// TODO how to set mask for barrel... rely on tunneling?
+			(*fixt)->filter.maskBits     = CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 		}
 	}
 
-	Turret::~Turret() {}
-
-	::Turret* Turret::produce(const b2v & pos) const
+	::Turret* Turret::produce(const b2v & pos, float dir) const
 	{
-		return new ::Turret(texture, world, pos, size, gun_size, gun_offset, density, gun_density, impulse, shot_size);
+		return new ::Turret(texture, origin, fixtures, world, pos, dir, impulse);
+	}
+
+	Projectile::Projectile(const std::string & filename) : Factory(filename)
+	{
+		std::ifstream fin(filename);
+		YAML::Parser parser(fin);
+
+		YAML::Node def;
+		if (parser.GetNextDocument(def))
+		{
+			def["damage"] >> damage;
+		}
+
+		// common fixture settings
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
+		{
+			(*fixt)->friction = 0.8f;
+			(*fixt)->filter.categoryBits = CATEGORY_SHOT;
+			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL | CATEGORY_TURRET;
+		}
+	}
+
+	::Projectile* Projectile::produce(const b2v & pos, float dir, Tank* owner, float impulse) const
+	{
+		return new ::Projectile(texture, origin, fixtures, world, pos, dir, owner, impulse);
+	}
+
+	::Wall* Wall::produce(b2v size, const b2v & pos, float dir) const
+	{
 	}
 }

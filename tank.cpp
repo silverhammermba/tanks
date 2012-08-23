@@ -5,18 +5,22 @@ const float Tank::ACCEL = 130.f;
 const float Tank::DECEL = 175.f;
 const float Tank::SPEED = 1.5f;
 
-Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact)
+Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact, Factory::Projectile & mg_fact)
 {
-	chassis = ch_fact.produce(pos);
-	motor = mo_fact.produce(*chassis);
+	float dir = 0.f;
+	chassis = ch_fact.produce(pos, dir);
+	b2v motor_pos = pos + b2v(chassis->get_motor_mount(), 0);
+	motor = mo_fact.produce(motor_pos, dir);
 
 	b2v turret_pos = pos + chassis->get_turret_mount();
-	turret = tu_fact.produce(turret_pos);
+	turret = tu_fact.produce(turret_pos, dir);
 
 	b2v ltread_pos = pos + b2v(0, chassis->get_tread_mount());
 	b2v rtread_pos = pos + b2v(0, -chassis->get_tread_mount());
-	ltread = tr_fact.produce(ltread_pos);
-	rtread = tr_fact.produce(rtread_pos);
+	ltread = tr_fact.produce(ltread_pos, dir);
+	rtread = tr_fact.produce(rtread_pos, dir);
+
+	magazine = &mg_fact;
 
 	components.push_back(ltread);
 	components.push_back(rtread);
@@ -31,14 +35,6 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	turret_speed = chassis->get_turret_speed();
 	firing = false;
 
-	// TODO can be passed to constructor?
-	/*
-	chassis->SetUserData(this);
-	turret->SetUserData(this);
-	ltread->SetUserData(this);
-	rtread->SetUserData(this);
-	*/
-
 	b2Body* body = chassis->get_body();
 	// attach turret
 	b2RevoluteJointDef turretJoint;
@@ -49,6 +45,11 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	turretJoint.enableMotor = true;
 
 	joint = (b2RevoluteJoint*)(world->CreateJoint(&turretJoint));
+
+	// attach motor
+	b2WeldJointDef mweld;
+	mweld.Initialize(body, motor->get_body(), motor_pos);
+	world->CreateJoint(&mweld);
 
 	// attach treads
 	b2WeldJointDef lweld;
@@ -62,6 +63,7 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 
 Tank::~Tank()
 {
+	delete motor;
 	delete chassis;
 	delete turret;
 	delete ltread;
@@ -123,5 +125,6 @@ void Tank::move()
 Projectile* Tank::fire()
 {
 	firing = false;
-	return turret->fire();
+	turret->recoil();
+	return magazine->produce(turret->tip(), turret->get_body()->GetAngle(), this, turret->get_impulse());
 }

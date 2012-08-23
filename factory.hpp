@@ -34,16 +34,15 @@ namespace Factory
 	{
 	protected:
 		string name;
-		b2v size;
-		b2v origin;
-		float density;
 		sf::Texture texture;
+		b2v origin;
+		std::vector<b2FixtureDef*> fixtures;
 	public:
 		Factory(const std::string & filename);
 		~Factory();
 	};
 
-	class Chassis : Factory
+	class Chassis : public Factory
 	{
 		b2v turret_mount;
 		float turret_speed;
@@ -51,43 +50,52 @@ namespace Factory
 		float motor_mount;
 	public:
 		Chassis(const std::string & filename);
-		~Chassis();
 
-		::Chassis* produce(const b2v & pos) const;
+		::Chassis* produce(const b2v & pos, float dir) const;
 	};
 
-	class Motor : Factory
+	class Motor : public Factory
 	{
 		float max_force;
 	public:
 		Motor(const std::string & filename);
-		~Motor();
 
-		::Motor* produce(::Chassis & chassis) const;
+		::Motor* produce(const b2v & pos, float dir) const;
 	};
 
-	class Tread : Factory
+	class Tread : public Factory
 	{
-		float max_force;
 	public:
 		Tread(const std::string & filename);
-		~Tread();
 
-		::Tread* produce(const b2v & pos) const;
+		::Tread* produce(const b2v & pos, float dir) const;
 	};
 
-	class Turret : Factory
+	class Turret : public Factory
 	{
-		b2v gun_size;
-		float gun_density;
-		b2v gun_origin;
 		float impulse;
-		float shot_size;
 	public:
 		Turret(const std::string & filename);
-		~Turret();
 
-		::Turret* produce(const b2v & pos) const;
+		::Turret* produce(const b2v & pos, float dir) const;
+	};
+
+	class Projectile : public Factory
+	{
+		float damage;
+	public:
+		Projectile(const std::string & filename);
+		~Projectile();
+
+		::Projectile* produce(const b2v & pos, float dir, Tank* owner, float impulse) const;
+	};
+
+	class Wall
+	{
+	public:
+		Wall() {};
+
+		::Wall* produce(b2v size, const b2v & pos, float dir) const;
 	};
 }
 
