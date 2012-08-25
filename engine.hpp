@@ -30,10 +30,10 @@ typedef b2Vec2 b2v;
 #include "motor.hpp"
 #include "projectile.hpp"
 #include "turret.hpp"
+#include "wall.hpp"
 #include "factory.hpp"
 #include "tank.hpp"
 #include "particle.hpp"
-#include "wall.hpp"
 
 const float ppm = 8.f; // pixels per meter
 

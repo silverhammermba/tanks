@@ -89,14 +89,6 @@ namespace Factory
 
 		::Projectile* produce(const b2v & pos, float dir, Tank* owner, float impulse) const;
 	};
-
-	class Wall
-	{
-	public:
-		Wall() {};
-
-		::Wall* produce(b2v size, const b2v & pos, float dir) const;
-	};
 }
 
 #endif

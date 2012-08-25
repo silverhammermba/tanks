@@ -6,8 +6,7 @@ class Wall : public Entity
 	sf::RectangleShape rect;
 public:
 	static b2Body* body;
-
-	Wall(b2v size, b2v pos, float angle = 0.f);
+	Wall(const b2v & size, const b2v & pos, float angle = 0.f);
 	~Wall() {};
 
 	entity_t type() const { return WALL; };

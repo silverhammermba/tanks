@@ -16,9 +16,7 @@ public:
 	b2v fwd_norm() const { return body->GetWorldVector(b2v(1.f, 0.f)); };
 	void startContact();
 	void explode();
-	void update();
 	sf::FloatRect getGlobalBounds() const { return sprite.getGlobalBounds(); };
-	void draw_on(sf::RenderWindow & window) const;
 };
 
 #endif

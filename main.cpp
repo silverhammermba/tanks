@@ -76,8 +76,16 @@ int main(int argc, char *argv[])
 	Factory::load_dir("yaml/turrets", turrets);
 	Factory::load_dir("yaml/projectiles", projectiles);
 
-	ShotListener listener;
-	world.SetContactListener(&listener);
+	// walls
+	b2BodyDef wallBody;
+	wallBody.position.Set(0.0f, 0.0f);
+	Wall::body = world.CreateBody(&wallBody);
+
+	std::list<Wall *> walls;
+	walls.push_back(new Wall(b2v(3.f, 100.f), b2v(-48.5f, 0.f)));
+	walls.push_back(new Wall(b2v(3.f, 100.f), b2v(48.5f, 0.f)));
+	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, -48.5f)));
+	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, 48.5f)));
 
 	// create ground box
 	b2BodyDef groundBody;
@@ -100,16 +108,9 @@ int main(int argc, char *argv[])
 	b2Vec2 groundPos = ground->GetPosition();
 	groundRect.setPosition(b2v2v2f(groundPos));
 
-	// walls
-	b2BodyDef wallBody;
-	wallBody.position.Set(0.0f, 0.0f);
-	Wall::body = world.CreateBody(&wallBody);
-
-	std::list<Wall *> walls;
-	walls.push_back(new Wall(b2v(3.f, 100.f), b2v(-48.5f, 0.f)));
-	walls.push_back(new Wall(b2v(3.f, 100.f), b2v(48.5f, 0.f)));
-	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, -48.5f)));
-	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, 48.5f)));
+	// collision listener
+	ShotListener listener;
+	world.SetContactListener(&listener);
 
 	// set up simulation
 	float timeStep = 1.0f / 60.0f;

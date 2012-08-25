@@ -1,6 +1,6 @@
 #include "engine.hpp"
 
-Turret::Turret(const sf::Texture & texture, const b2v origin, const std::vector<b2FixtureDef*> & fixtures, b2World* world, const b2v pos, float dir, float imp)
+Turret::Turret(const sf::Texture & texture, const b2v & origin, const std::vector<b2FixtureDef*> & fixtures, b2World* world, const b2v & pos, float dir, float imp)
 	: Entity(texture, origin, fixtures, world, pos, dir)
 {
 	shot_impulse = imp;

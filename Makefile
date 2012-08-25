@@ -15,7 +15,7 @@ factory.o: factory.cpp engine.o
 tank.o: tank.cpp engine.o
 	g++ -ggdb -c tank.cpp -std=c++11
 
-entity.o: entity.cpp entity.hpp
+entity.o: entity.cpp engine.o
 	g++ -ggdb -c entity.cpp -std=c++11
 
 projectile.o: projectile.cpp engine.o
