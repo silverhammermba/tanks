@@ -1,8 +1,16 @@
 name: Simple
-size: [3.15, 3.15]
-mass: 9684.0
-gun_size: [5.24, 0.3]
-gun_mass: 342.7
-gun_offset: 0.82
+origin: [0, 0]
 impulse: 30000
-shot_size: 0.3
+fixtures:
+  - density: 975
+    vertices:
+    - [1.08, 1.08]
+    - [-1.08, 1.08]
+    - [-1.08, -1.08]
+    - [1.08, -1.08]
+  - density: 218
+    vertices:
+    - [5.24, 0.15]
+    - [0, 0.15]
+    - [0, -0.15]
+    - [5.24, -0.15]

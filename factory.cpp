@@ -41,6 +41,7 @@ namespace Factory
 		if (parser.GetNextDocument(def))
 		{
 			def["name"] >> name;
+			// TODO set origin to 0 if not supplied
 			def["origin"] >> origin;
 			const YAML::Node & fixs = def["fixtures"];
 			for (int i = 0; i < fixs.size(); i++)

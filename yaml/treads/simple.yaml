@@ -1,3 +1,9 @@
 name: Simple
-size: [6.95, 0.68]
-mass: 6536.0
+origin: [0, 0]
+fixtures:
+  - vertices:
+    - [4.34, 0.34]
+    - [-4.34, 0.34]
+    - [-4.34, -0.34]
+    - [4.34, -0.34]
+    density: 1383

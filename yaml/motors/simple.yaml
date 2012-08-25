@@ -1,4 +1,10 @@
 name: Simple
-size: [1, 2]
-mass: 1000
+origin: [0, 0]
+fixtures:
+  - vertices:
+    - [0.5, 1.0]
+    - [-0.5, 1.0]
+    - [-0.5, -1.0]
+    - [0.5, -1.0]
+    density: 500
 force: 37647.0
