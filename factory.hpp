@@ -8,7 +8,7 @@ namespace Factory
 	extern b2World* world;
 
 	template <class T>
-	int load_dir(std::string dir, std::list<T*> & list)
+	int load_dir(std::string dir, std::vector<T*> & vector)
 	{
 		DIR* dp;
 		struct dirent* dirp;
@@ -24,7 +24,7 @@ namespace Factory
 			std::string filename(dirp->d_name);
 
 			if (filename[0] != '.')
-				list.push_back(new T(dir + "/" + filename));
+				vector.push_back(new T(dir + "/" + filename));
 		}
 		closedir(dp);
 		return 0;

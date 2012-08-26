@@ -17,6 +17,12 @@ public:
 
 void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen);
 
+int xres = 1024;
+int yres = 600;
+// TODO gcd
+int xrat = 128;
+int yrat = 75;
+
 int main(int argc, char *argv[])
 {
 	srand((unsigned int)time(NULL));
@@ -39,7 +45,7 @@ int main(int argc, char *argv[])
 
 	sf::RenderWindow window
 	{
-		sf::VideoMode(800, 600, 32),
+		sf::VideoMode(xres, yres, 32),
 		"Tank Battle"
 	};
 	window.setVerticalSyncEnabled(false);
@@ -64,11 +70,11 @@ int main(int argc, char *argv[])
 	// factories for creating tanks
 	Factory::world = &world;
 	
-	std::list<Factory::Chassis*> chasses;
-	std::list<Factory::Motor*> motors;
-	std::list<Factory::Tread*> treads;
-	std::list<Factory::Turret*> turrets;
-	std::list<Factory::Projectile*> projectiles;
+	std::vector<Factory::Chassis*> chasses;
+	std::vector<Factory::Motor*> motors;
+	std::vector<Factory::Tread*> treads;
+	std::vector<Factory::Turret*> turrets;
+	std::vector<Factory::Projectile*> projectiles;
 
 	Factory::load_dir("yaml/chasses", chasses);
 	Factory::load_dir("yaml/motors", motors);
@@ -150,7 +156,7 @@ int main(int argc, char *argv[])
 					}
 				}
 				if (!taken)
-					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), *chasses.front(), *motors.front(), *turrets.front(), *treads.front(), *projectiles.front()));
+					players.push_back(new Tank(event.joystickButton.joystickId, &world, b2v(0, 0), *chasses.at(rand_i(chasses.size())), *motors.at(rand_i(motors.size())), *turrets.at(rand_i(turrets.size())), *treads.at(rand_i(treads.size())), *projectiles.at(rand_i(projectiles.size()))));
 			}
 			else
 			{
@@ -256,14 +262,13 @@ int main(int argc, char *argv[])
 void set_up(sf::RenderWindow & window, sf::View & view, sf::FloatRect & screen)
 {
 	sf::Vector2u size = window.getSize();
-	float prop = float (size.x) / size.y;
-	if (size.x * 3 < size.y * 4)
+	if (size.x * yrat < size.y * xrat)
 	{
-		view.setSize(v2f(800, -(800.f * size.y) / size.x));
+		view.setSize(v2f(xres, -((float)xres * size.y) / size.x));
 	}
-	else if (size.x * 3 > size.y * 4)
+	else if (size.x * yrat > size.y * xrat)
 	{
-		view.setSize(v2f((600.f * size.x) / size.y, -600.f));
+		view.setSize(v2f(((float)yres * size.x) / size.y, -yres));
 	}
 	view.setCenter(0.f, 0.f);
 	window.setView(view);
