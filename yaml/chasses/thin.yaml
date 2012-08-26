@@ -1,0 +1,13 @@
+name: Thin
+origin: [0, 0]
+turret_mount: [1.5, 0]
+turret_speed: 0.5
+tread_mount: 2.75
+motor_mount: -3.0
+fixtures:
+  - density: 350
+    vertices:
+    - [4.0, 2.25]
+    - [-4.0, 2.25]
+    - [-4.0, -2.25]
+    - [4.0, -2.25]
