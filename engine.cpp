@@ -5,7 +5,7 @@ float rand_f(float max)
 	return (rand() / (float)RAND_MAX) * max;
 }
 
-float rand_i(int max)
+int rand_i(int max)
 {
 	return rand() % max;
 }

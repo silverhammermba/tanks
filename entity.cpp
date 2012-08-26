@@ -3,9 +3,14 @@
 Entity::Entity(const sf::Texture & texture, const b2v origin, const std::vector<b2FixtureDef*> & fixtures, b2World* world, const b2v pos, float dir)
 {
 	sprite.setTexture(texture);
+	// TODO 
+	v2f sporigin = v2f(sprite.getTexture()->getSize()) / 2.f + b2v2v2f(origin) / (float)pixel_scale;
+	sprite.setOrigin(sporigin);
+	std::cerr << "Sprite size: " << sprite.getTexture()->getSize().x << "," << sprite.getTexture()->getSize().y << "\n";
+	std::cerr << "Origin is " << origin.x << "," << origin.y << "\nSetting sprite origin to " << sporigin.x << "," << sporigin.y << "\n";
+	std::cerr << "Origin (pixels) is " << b2v2v2f(origin).x << "," << b2v2v2f(origin).y << "\n\n";
 	// TODO flip?
-	sprite.scale(2, 2);
-	sprite.setOrigin(v2f(sprite.getTexture()->getSize()) / 2.f + b2v2v2f(origin));
+	sprite.scale(pixel_scale, pixel_scale);
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;

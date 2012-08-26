@@ -35,7 +35,8 @@ typedef b2Vec2 b2v;
 #include "tank.hpp"
 #include "particle.hpp"
 
-const float ppm = 8.f; // pixels per meter
+const int pixel_scale = 2; // scale of sprites
+const float ppm = 8.f; // screen pixels per meter
 
 #define CATEGORY_CHASSIS(n) (1 << (n))
 #define CATEGORY_TURRET(n) (1 << ((n) + 4))
@@ -46,7 +47,7 @@ const short CATEGORY_WALL = 1 << 9;
 const short CATEGORY_SMOKE = 1 << 10;
 
 float rand_f(float max);
-float rand_i(int max);
+int rand_i(int max);
 float deg2rad(float deg);
 float rad2deg(float rad);
 float deadzone(float val, float zone, float max);
