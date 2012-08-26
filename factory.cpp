@@ -14,7 +14,6 @@ void operator >> (const YAML::Node& node, b2FixtureDef* fixture)
 	{
 		verts[i] >> vertices[i];
 	}
-	// TODO FREE THIS!
 	b2PolygonShape* polygon = new b2PolygonShape;
 	// pretty sure we don't need to keep vertices around
 	polygon->Set(vertices, verts.size());
@@ -180,9 +179,8 @@ namespace Factory
 	{
 		// TODO too expensive?
 		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
-		{
 			(*fixt)->filter.maskBits = mask ^ CATEGORY_CHASSIS(player) ^ CATEGORY_TURRET(player);
-		}
+
 		return new ::Projectile(texture, origin, fixtures, world, pos, dir, owner, impulse);
 	}
 }

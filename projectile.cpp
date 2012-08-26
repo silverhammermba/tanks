@@ -20,5 +20,4 @@ void Projectile::startContact()
 void Projectile::explode()
 {
 	// TODO something awesome?
-	std::cerr << "BOOOOM!\n";
 }
