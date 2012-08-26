@@ -1,13 +1,13 @@
 name: Simple
 origin: [0, 0]
-fixtures:
-  - vertices:
-    - [4.34, 3.34]
-    - [-4.34, 3.34]
-    - [-4.34, -3.34]
-    - [4.34, -3.34]
-    density: 345
 turret_mount: [-1.7, -1.0]
 turret_speed: 1
 tread_mount: 2.88
 motor_mount: -3.75
+fixtures:
+  - density: 345
+    vertices:
+    - [4.34, 3.34]
+    - [-4.34, 3.34]
+    - [-4.34, -3.34]
+    - [4.34, -3.34]

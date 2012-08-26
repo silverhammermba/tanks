@@ -1,10 +1,10 @@
 name: Simple
 origin: [0, 0]
+force: 37647.0
 fixtures:
-  - vertices:
+  - density: 500
+    vertices:
     - [0.5, 1.0]
     - [-0.5, 1.0]
     - [-0.5, -1.0]
     - [0.5, -1.0]
-    density: 500
-force: 37647.0

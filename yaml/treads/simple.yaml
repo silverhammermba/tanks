@@ -1,9 +1,9 @@
 name: Simple
 origin: [0, 0]
 fixtures:
-  - vertices:
+  - density: 1383
+    vertices:
     - [4.34, 0.34]
     - [-4.34, 0.34]
     - [-4.34, -0.34]
     - [4.34, -0.34]
-    density: 1383
