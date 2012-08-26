@@ -9,7 +9,7 @@ Wall::Wall(const b2v & size, const b2v & pos, float angle) : rect(b2v2v2f(size))
 	b2FixtureDef fixture;
 	fixture.shape = &box;
 	fixture.filter.categoryBits = CATEGORY_WALL;
-	fixture.filter.maskBits     = CATEGORY_TANK | CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_SMOKE;
+	fixture.filter.maskBits     = CATEGORY_CHASSES | CATEGORY_TURRETS | CATEGORY_SHOT | CATEGORY_SMOKE;
 
 	body->CreateFixture(&fixture);
 	body->SetUserData(this);

@@ -87,25 +87,11 @@ int main(int argc, char *argv[])
 	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, -48.5f)));
 	walls.push_back(new Wall(b2v(100.f, 3.f), b2v(0.f, 48.5f)));
 
-	// create ground box
-	b2BodyDef groundBody;
-	groundBody.position.Set(0.0f, 0.0f);
-	b2Body* ground = world.CreateBody(&groundBody);
-
+	b2v groundPos(0.f, 0.f);
 	b2v groundSize(100.f, 100.f);
-	b2PolygonShape groundBox;
-	groundBox.SetAsBox(groundSize.x / 2.f, groundSize.y / 2.f);
-	b2FixtureDef groundFixture;
-	groundFixture.shape = &groundBox;
-	// doesn't collide with anything
-	groundFixture.filter.categoryBits = CATEGORY_GROUND;
-	groundFixture.filter.maskBits     = 0;
-
-	ground->CreateFixture(&groundFixture);
 	sf::RectangleShape groundRect(b2v2v2f(groundSize));
 	groundRect.setOrigin(b2v2v2f(groundSize) / 2.f);
 	groundRect.setFillColor(sf::Color(150, 150, 150));
-	b2Vec2 groundPos = ground->GetPosition();
 	groundRect.setPosition(b2v2v2f(groundPos));
 
 	// collision listener
@@ -196,9 +182,9 @@ int main(int argc, char *argv[])
 					b2v pos = (*shot)->pos();
 					b2v norm = (*shot)->fwd_norm();
 					for (int i = 0; i < rand_i(100); i++)
-						smoke.push_back(new Particle(&world, pos, norm, CATEGORY_TANK));
+						smoke.push_back(new Particle(&world, pos, norm, CATEGORY_CHASSES));
 					for (int i = 0; i < rand_i(60); i++)
-						smoke.push_back(new Particle(&world, pos, norm, CATEGORY_TURRET));
+						smoke.push_back(new Particle(&world, pos, norm, CATEGORY_TURRETS));
 					for (int i = 0; i < rand_i(40); i++)
 						smoke.push_back(new Particle(&world, pos, norm, 0));
 

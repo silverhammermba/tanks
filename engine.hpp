@@ -37,12 +37,13 @@ typedef b2Vec2 b2v;
 
 const float ppm = 8.f; // pixels per meter
 
-const short CATEGORY_TANK = 1 << 0;
-const short CATEGORY_WALL = 1 << 1;
-const short CATEGORY_GROUND = 1 << 2;
-const short CATEGORY_TURRET = 1 << 3;
-const short CATEGORY_SHOT = 1 << 4;
-const short CATEGORY_SMOKE = 1 << 5;
+#define CATEGORY_CHASSIS(n) (1 << (n))
+#define CATEGORY_TURRET(n) (1 << ((n) + 4))
+const short CATEGORY_CHASSES = 0x0f;
+const short CATEGORY_TURRETS = 0xf0;
+const short CATEGORY_SHOT = 1 << 8;
+const short CATEGORY_WALL = 1 << 9;
+const short CATEGORY_SMOKE = 1 << 10;
 
 float rand_f(float max);
 float rand_i(int max);

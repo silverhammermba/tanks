@@ -76,18 +76,17 @@ namespace Factory
 			def["tread_mount"] >> tread_mount;
 			def["motor_mount"] >> motor_mount;
 		}
+	}
 
+	::Chassis* Chassis::produce(int player, const b2v & pos, float dir) const
+	{
 		// common fixture settings
 		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
 		{
 			(*fixt)->friction = 0.3f;
-			(*fixt)->filter.categoryBits = CATEGORY_TANK;
-			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
+			(*fixt)->filter.categoryBits = CATEGORY_CHASSIS(player);
+			(*fixt)->filter.maskBits     = CATEGORY_CHASSES | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 		}
-	}
-
-	::Chassis* Chassis::produce(const b2v & pos, float dir) const
-	{
 		return new ::Chassis(texture, origin, fixtures, world, pos, dir, motor_mount, turret_mount, turret_speed, tread_mount);
 	}
 
@@ -101,35 +100,35 @@ namespace Factory
 		{
 			def["force"] >> max_force;
 		}
+	}
 
+	::Motor* Motor::produce(int player, const b2v & pos, float dir) const
+	{
 		// common fixture settings
 		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
 		{
 			(*fixt)->friction = 0.3f;
-			(*fixt)->filter.categoryBits = CATEGORY_TANK;
-			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
+			(*fixt)->filter.categoryBits = CATEGORY_CHASSIS(player);
+			(*fixt)->filter.maskBits     = CATEGORY_CHASSES | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 		}
-	}
-
-	::Motor* Motor::produce(const b2v & pos, float dir) const
-	{
 		return new ::Motor(texture, origin, fixtures, world, pos, dir, max_force);
 	}
 
 	Tread::Tread(const std::string & filename) : Factory(filename)
 	{
+		// TODO load breaking power
+	}
+
+
+	::Tread* Tread::produce(int player, const b2v & pos, float dir) const
+	{
 		// common fixture settings
 		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
 		{
 			(*fixt)->friction = 0.3f;
-			(*fixt)->filter.categoryBits = CATEGORY_TANK;
-			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_SHOT | CATEGORY_WALL;
+			(*fixt)->filter.categoryBits = CATEGORY_CHASSIS(player);
+			(*fixt)->filter.maskBits     = CATEGORY_CHASSES | CATEGORY_SHOT | CATEGORY_WALL;
 		}
-	}
-
-
-	::Tread* Tread::produce(const b2v & pos, float dir) const
-	{
 		return new ::Tread(texture, origin, fixtures, world, pos, dir);
 	}
 
@@ -143,19 +142,17 @@ namespace Factory
 		{
 			def["impulse"] >> impulse;
 		}
+	}
 
+	::Turret* Turret::produce(int player, const b2v & pos, float dir) const
+	{
 		// common fixture settings
 		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
 		{
 			(*fixt)->friction = 0.3f;
-			(*fixt)->filter.categoryBits = CATEGORY_TURRET;
-			// TODO how to set mask for barrel... rely on tunneling?
-			(*fixt)->filter.maskBits     = CATEGORY_TURRET | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
+			(*fixt)->filter.categoryBits = CATEGORY_TURRET(player);
+			(*fixt)->filter.maskBits     = CATEGORY_TURRETS | CATEGORY_SHOT | CATEGORY_WALL | CATEGORY_SMOKE;
 		}
-	}
-
-	::Turret* Turret::produce(const b2v & pos, float dir) const
-	{
 		return new ::Turret(texture, origin, fixtures, world, pos, dir, impulse);
 	}
 
@@ -175,12 +172,17 @@ namespace Factory
 		{
 			(*fixt)->friction = 0.8f;
 			(*fixt)->filter.categoryBits = CATEGORY_SHOT;
-			(*fixt)->filter.maskBits     = CATEGORY_TANK | CATEGORY_WALL | CATEGORY_TURRET;
 		}
+		mask = CATEGORY_WALL | CATEGORY_CHASSES | CATEGORY_TURRETS;
 	}
 
-	::Projectile* Projectile::produce(const b2v & pos, float dir, Tank* owner, float impulse) const
+	::Projectile* Projectile::produce(int player, const b2v & pos, float dir, Tank* owner, float impulse) const
 	{
+		// TODO too expensive?
+		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
+		{
+			(*fixt)->filter.maskBits = mask ^ CATEGORY_CHASSIS(player) ^ CATEGORY_TURRET(player);
+		}
 		return new ::Projectile(texture, origin, fixtures, world, pos, dir, owner, impulse);
 	}
 }

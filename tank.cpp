@@ -7,18 +7,20 @@ const float Tank::SPEED = 1.5f;
 
 Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact, Factory::Motor & mo_fact, Factory::Turret & tu_fact, Factory::Tread & tr_fact, Factory::Projectile & mg_fact)
 {
+	joystick = joy;
+
 	float dir = 0.f;
-	chassis = ch_fact.produce(pos, dir);
+	chassis = ch_fact.produce(joystick, pos, dir);
 	b2v motor_pos = pos + b2v(chassis->get_motor_mount(), 0);
-	motor = mo_fact.produce(motor_pos, dir);
+	motor = mo_fact.produce(joystick, motor_pos, dir);
 
 	b2v turret_pos = pos + chassis->get_turret_mount();
-	turret = tu_fact.produce(turret_pos, dir);
+	turret = tu_fact.produce(joystick, turret_pos, dir);
 
 	b2v ltread_pos = pos + b2v(0, chassis->get_tread_mount());
 	b2v rtread_pos = pos + b2v(0, -chassis->get_tread_mount());
-	ltread = tr_fact.produce(ltread_pos, dir);
-	rtread = tr_fact.produce(rtread_pos, dir);
+	ltread = tr_fact.produce(joystick, ltread_pos, dir);
+	rtread = tr_fact.produce(joystick, rtread_pos, dir);
 
 	magazine = &mg_fact;
 
@@ -28,7 +30,6 @@ Tank::Tank(int joy, b2World* world, const b2v & pos, Factory::Chassis & ch_fact,
 	components.push_back(motor);
 	components.push_back(turret);
 
-	joystick = joy;
 	left = 0.f; // left tread percent
 	right = 0.f; // right tread percent
 	turn = 0.f;
@@ -126,5 +127,5 @@ Projectile* Tank::fire()
 {
 	firing = false;
 	turret->recoil();
-	return magazine->produce(turret->tip(), turret->get_body()->GetAngle(), this, turret->get_impulse());
+	return magazine->produce(joystick, turret->tip(), turret->get_body()->GetAngle(), this, turret->get_impulse());
 }

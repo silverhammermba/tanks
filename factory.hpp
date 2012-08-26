@@ -51,7 +51,7 @@ namespace Factory
 	public:
 		Chassis(const std::string & filename);
 
-		::Chassis* produce(const b2v & pos, float dir) const;
+		::Chassis* produce(int player, const b2v & pos, float dir) const;
 	};
 
 	class Motor : public Factory
@@ -60,7 +60,7 @@ namespace Factory
 	public:
 		Motor(const std::string & filename);
 
-		::Motor* produce(const b2v & pos, float dir) const;
+		::Motor* produce(int player, const b2v & pos, float dir) const;
 	};
 
 	class Tread : public Factory
@@ -68,7 +68,7 @@ namespace Factory
 	public:
 		Tread(const std::string & filename);
 
-		::Tread* produce(const b2v & pos, float dir) const;
+		::Tread* produce(int player, const b2v & pos, float dir) const;
 	};
 
 	class Turret : public Factory
@@ -77,17 +77,18 @@ namespace Factory
 	public:
 		Turret(const std::string & filename);
 
-		::Turret* produce(const b2v & pos, float dir) const;
+		::Turret* produce(int player, const b2v & pos, float dir) const;
 	};
 
 	class Projectile : public Factory
 	{
 		float damage;
+		short mask;
 	public:
 		Projectile(const std::string & filename);
 		~Projectile();
 
-		::Projectile* produce(const b2v & pos, float dir, Tank* owner, float impulse) const;
+		::Projectile* produce(int player, const b2v & pos, float dir, Tank* owner, float impulse) const;
 	};
 }
 
