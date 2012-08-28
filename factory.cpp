@@ -8,17 +8,34 @@ void operator >> (const YAML::Node& node, b2v & v)
 
 void operator >> (const YAML::Node& node, b2FixtureDef* fixture)
 {
+	node["density"] >> fixture->density;
+
+	bool symmetry;
+	if (const YAML::Node* pkey = node.FindValue("symmetry"))
+		*pkey >> symmetry;
+	else
+		symmetry = false;
+
 	const YAML::Node & verts = node["vertices"];
-	b2v vertices[verts.size()];
+	int number = verts.size() * (symmetry ? 2 : 1);
+	b2v vertices[number];
 	for (int i = 0; i < verts.size(); i++)
 	{
 		verts[i] >> vertices[i];
 	}
+	if (symmetry)
+	{
+		for (int i = verts.size(), j = verts.size() - 1; j >= 0; i++, j--)
+		{
+			if (vertices[j].y != 0.f)
+				vertices[i] = b2v(vertices[j].x, -vertices[j].y);
+		}
+	}
+
 	b2PolygonShape* polygon = new b2PolygonShape;
 	// pretty sure we don't need to keep vertices around
-	polygon->Set(vertices, verts.size());
+	polygon->Set(vertices, number);
 	fixture->shape = polygon;
-	node["density"] >> fixture->density;
 }
 
 namespace Factory
@@ -38,20 +55,26 @@ namespace Factory
 		YAML::Parser parser(fin);
 
 		YAML::Node def;
-		if (parser.GetNextDocument(def))
+		parser.GetNextDocument(def);
+
+		if (const YAML::Node* pkey = def.FindValue("name"))
+			*pkey >> name;
+		else // TODO need better placeholder name
+			name = std::string(filename);
+
+		if (const YAML::Node* pkey = def.FindValue("origin"))
+			*pkey >> origin;
+		else
+			origin = b2v(0, 0);
+
+		const YAML::Node & fixs = def["fixtures"];
+		for (int i = 0; i < fixs.size(); i++)
 		{
-			def["name"] >> name;
-			// TODO set origin to 0 if not supplied
-			def["origin"] >> origin;
-			const YAML::Node & fixs = def["fixtures"];
-			for (int i = 0; i < fixs.size(); i++)
-			{
-				b2FixtureDef* fixture = new b2FixtureDef;
-				fixs[i] >> fixture;
-				fixtures.push_back(fixture);
-			}
+			b2FixtureDef* fixture = new b2FixtureDef;
+			fixs[i] >> fixture;
+			fixtures.push_back(fixture);
 		}
-		// TODO raise error on else
+		// TODO reflect fixtures
 	}
 
 	Factory::~Factory()

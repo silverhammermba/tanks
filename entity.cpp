@@ -4,7 +4,6 @@ Entity::Entity(const sf::Texture & texture, const b2v origin, const std::vector<
 {
 	sprite.setTexture(texture);
 	sprite.setOrigin(v2f(sprite.getTexture()->getSize()) / 2.f + b2v2v2f(origin) / (float)pixel_scale);
-	// TODO flip?
 	sprite.scale(pixel_scale, -pixel_scale);
 
 	b2BodyDef bodyDef;
