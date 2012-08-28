@@ -1,21 +1,19 @@
 name: Mammoth
 origin: [-1.85, 0]
 impulse: 25000
+# TODO too dense?
 fixtures:
   - density: 975
+    symmetry: true
     vertices:
     - [1.24, 3.11]
     - [-0.71, 3.11]
-    - [-0.71, -3.11]
-    - [1.24, -3.11]
   - density: 975
+    symmetry: true
     vertices:
     - [-0.71, 2.36]
     - [-1.53, 2.36]
     - [-2.24, 1.62]
-    - [-2.24, -1.62]
-    - [-1.53, -2.36]
-    - [-0.71, -2.36]
   - density: 218
     vertices:
     - [5.85, 2.38]
