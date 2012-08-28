@@ -30,6 +30,7 @@ namespace Factory
 		std::string texture_name(filename);
 		texture_name.replace(texture_name.size() - 4, 4, "png").replace(0, 4, "graphics");
 		std::cerr << "Loading " << texture_name << "...\n";
+		// TODO raise exception if file does not exist
 		texture.loadFromFile(texture_name);
 
 		std::cerr << "Loading " << filename << "...\n";
@@ -116,6 +117,7 @@ namespace Factory
 	Tread::Tread(const std::string & filename) : Factory(filename)
 	{
 		// TODO load breaking power
+		// TODO load right tread differently? so origin is against tank
 	}
 
 

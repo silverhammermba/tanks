@@ -24,7 +24,20 @@ namespace Factory
 			std::string filename(dirp->d_name);
 
 			if (filename[0] != '.')
-				vector.push_back(new T(dir + "/" + filename));
+			{
+				try
+				{
+					vector.push_back(new T(dir + "/" + filename));
+				}
+				catch(YAML::Exception exception)
+				{
+					std::cerr << "YAML error while loading " << (dir + "/" + filename) << "\n";
+				}
+				catch(std::string error)
+				{
+					std::cerr << error << "\n";
+				}
+			}
 		}
 		closedir(dp);
 		return 0;
