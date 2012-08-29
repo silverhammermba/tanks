@@ -3,8 +3,7 @@ origin: [0, 0]
 force: 37647.0
 fixtures:
   - density: 500
+    symmetry: true
     vertices:
     - [0.5, 1.0]
     - [-0.5, 1.0]
-    - [-0.5, -1.0]
-    - [0.5, -1.0]

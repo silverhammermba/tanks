@@ -1,6 +1,7 @@
 name: Mule
 origin: [-0.37, 0]
 force: 45000
+reflect: [1]
 fixtures:
   - density: 700
     vertices:
@@ -8,9 +9,3 @@ fixtures:
     - [-0.35, 1.64]
     - [-0.64, 1.06]
     - [0.77, 0]
-  - density: 700
-    vertices:
-    - [0.77, 0]
-    - [-0.64, -1.06]
-    - [-0.35, -1.64]
-    - [1.33, -1.35]

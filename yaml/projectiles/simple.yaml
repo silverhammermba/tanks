@@ -3,8 +3,7 @@ origin: [0, 0]
 damage: 100
 fixtures:
   - density: 1500
+    symmetry: true
     vertices:
     - [0.45, 0.15]
     - [-0.45, 0.15]
-    - [-0.45, -0.15]
-    - [0.45, -0.15]

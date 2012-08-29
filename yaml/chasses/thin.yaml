@@ -6,8 +6,7 @@ tread_mount: 2.75
 motor_mount: -3.0
 fixtures:
   - density: 350
+    symmetry: true
     vertices:
     - [4.0, 2.25]
     - [-4.0, 2.25]
-    - [-4.0, -2.25]
-    - [4.0, -2.25]

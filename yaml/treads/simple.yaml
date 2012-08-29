@@ -2,8 +2,7 @@ name: Simple
 origin: [0, 0]
 fixtures:
   - density: 1383
+    symmetry: true
     vertices:
     - [4.34, 0.34]
     - [-4.34, 0.34]
-    - [-4.34, -0.34]
-    - [4.34, -0.34]
