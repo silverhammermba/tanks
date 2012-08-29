@@ -74,7 +74,42 @@ namespace Factory
 			fixs[i] >> fixture;
 			fixtures.push_back(fixture);
 		}
-		// TODO reflect fixtures
+
+		// double check for errors, this was too easy...
+		if (const YAML::Node* pkey = def.FindValue("reflect"))
+		{
+			int j;
+			for (int i = 0; i < pkey->size(); i++)
+			{
+				(*pkey)[i] >> j;
+				if (j >= fixs.size())
+				{
+					// TODO index error
+				}
+				else
+				{
+					b2FixtureDef* fixture = new b2FixtureDef;
+					b2PolygonShape* polygon = new b2PolygonShape;
+
+					b2FixtureDef* fixt = fixtures.at(j);
+				   	const b2PolygonShape* poly = static_cast<const b2PolygonShape*>(fixt->shape);
+
+					fixture->density = fixt->density;
+
+					int n = poly->m_vertexCount;
+					b2v vertices[n];
+					for (int i = 0; i < n; i++)
+					{
+						vertices[n - i - 1] = b2v(poly->m_vertices[i].x, -poly->m_vertices[i].y);
+					}
+
+					polygon->Set(vertices, n);
+					fixture->shape = polygon;
+
+					fixtures.push_back(fixture);
+				}
+			}
+		}
 	}
 
 	Factory::~Factory()
