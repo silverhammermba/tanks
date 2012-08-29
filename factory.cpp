@@ -29,6 +29,11 @@ void operator >> (const YAML::Node& node, b2FixtureDef* fixture)
 		{
 			if (vertices[j].y != 0.f)
 				vertices[i] = b2v(vertices[j].x, -vertices[j].y);
+			else
+			{
+				i--;
+				number--;
+			}
 		}
 	}
 
