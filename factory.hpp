@@ -1,6 +1,8 @@
 #ifndef FACTORY_H_
 #define FACTORY_H_
 
+b2FixtureDef* reflect_fixture_def(b2FixtureDef* fixt);
+
 namespace Factory
 {
 	using std::string;
@@ -78,10 +80,12 @@ namespace Factory
 
 	class Tread : public Factory
 	{
+		std::vector<b2FixtureDef*> right_fixtures;
 	public:
 		Tread(const std::string & filename);
 
-		::Tread* produce(int player, const b2v & pos, float dir) const;
+		::Tread* produce_left(int player, const b2v & pos, float dir) const;
+		::Tread* produce_right(int player, const b2v & pos, float dir) const;
 	};
 
 	class Turret : public Factory

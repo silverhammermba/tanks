@@ -1,5 +1,27 @@
 #include "engine.hpp"
 
+b2FixtureDef* reflect_fixture_def(b2FixtureDef* fixt)
+{
+	b2FixtureDef* fixture = new b2FixtureDef;
+	b2PolygonShape* polygon = new b2PolygonShape;
+
+	const b2PolygonShape* poly = static_cast<const b2PolygonShape*>(fixt->shape);
+
+	fixture->density = fixt->density;
+
+	int n = poly->m_vertexCount;
+	b2v vertices[n];
+	for (int i = 0; i < n; i++)
+	{
+		vertices[n - i - 1] = b2v(poly->m_vertices[i].x, -poly->m_vertices[i].y);
+	}
+
+	polygon->Set(vertices, n);
+	fixture->shape = polygon;
+
+	return fixture;
+}
+
 void operator >> (const YAML::Node& node, b2v & v)
 {
 	node[0] >> v.x;
@@ -92,27 +114,7 @@ namespace Factory
 					// TODO index error
 				}
 				else
-				{
-					b2FixtureDef* fixture = new b2FixtureDef;
-					b2PolygonShape* polygon = new b2PolygonShape;
-
-					b2FixtureDef* fixt = fixtures.at(j);
-				   	const b2PolygonShape* poly = static_cast<const b2PolygonShape*>(fixt->shape);
-
-					fixture->density = fixt->density;
-
-					int n = poly->m_vertexCount;
-					b2v vertices[n];
-					for (int i = 0; i < n; i++)
-					{
-						vertices[n - i - 1] = b2v(poly->m_vertices[i].x, -poly->m_vertices[i].y);
-					}
-
-					polygon->Set(vertices, n);
-					fixture->shape = polygon;
-
-					fixtures.push_back(fixture);
-				}
+					fixtures.push_back(reflect_fixture_def(fixtures.at(j)));
 			}
 		}
 	}
@@ -184,7 +186,7 @@ namespace Factory
 	}
 
 
-	::Tread* Tread::produce(int player, const b2v & pos, float dir) const
+	::Tread* Tread::produce_left(int player, const b2v & pos, float dir) const
 	{
 		// common fixture settings
 		for (auto fixt = fixtures.begin(); fixt != fixtures.end(); fixt++)
